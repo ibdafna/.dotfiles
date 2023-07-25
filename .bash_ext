@@ -1,0 +1,59 @@
+# Google Chrome browser environment variable for WSL
+export BROWSER='/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'
+
+# WSL2 hack to allow Windows localhost access
+export WSL_HOST_IP=$(grep -Po '(?<=nameserver ).*' /etc/resolv.conf)
+
+# Env variable to check if git is available
+command -v git >/dev/null 2>&1
+GIT_AVAILABLE=$?
+
+# Add JDK path
+export PATH=$PATH:/home/idafna/bin/jdk-17.0.4.1+1/bin
+
+# Get current status of git repo
+function parse_git_dirty {
+  if [ $GIT_AVAILABLE -eq 0 ]; then
+    STATUS="$(git status 2> /dev/null)"
+    if [[ $? -ne 0 ]]; then printf "-"; return; else printf "["; fi
+    if echo ${STATUS} | grep -c "renamed:"         &> /dev/null; then printf ">"; else printf ""; fi
+    if echo ${STATUS} | grep -c "branch is ahead:" &> /dev/null; then printf "!"; else printf ""; fi
+    if echo ${STATUS} | grep -c "new file::"       &> /dev/null; then printf "+"; else printf ""; fi
+    if echo ${STATUS} | grep -c "Untracked files:" &> /dev/null; then printf "?"; else printf ""; fi
+    if echo ${STATUS} | grep -c "modified:"        &> /dev/null; then printf "*"; else printf ""; fi
+    if echo ${STATUS} | grep -c "deleted:"         &> /dev/null; then printf "-"; else printf ""; fi
+    printf "]"
+  else
+    "" 2> /dev/null
+  fi
+}
+
+parse_git_branch() {
+  # Long form
+  if [ $GIT_AVAILABLE -eq 0 ]; then
+    git rev-parse --abbrev-ref HEAD 2> /dev/null
+  else
+    "" 2> /dev/null
+  fi
+}
+
+parse_conda_environment() {
+  if [[ $(echo $CONDA_DEFAULT_ENV) ]]; then
+      echo "($CONDA_DEFAULT_ENV) "
+  else
+      echo ""
+  fi
+}
+
+# Setting the title of the terminal
+settitle () {
+  echo -ne '\033]0;'"$1"'\a'
+}
+
+__export_ps1() {
+  export PS1='\[\e[0;38;5;198m\]$(parse_conda_environment)\[\e[0;38;5;208m\]\u\[\e[m\] \[\e[0;38;5;85m\]\w\[\e[m\] \[\e[0;38;5;226m\]$(parse_git_branch)\[\e[m\] \[\e[0;38;5;218m\]$(parse_git_dirty)\[\e[m\] \[\e[0;38;5;51m\]\$\[\e[m\] \[\e0'
+  settitle $(pwd)
+}
+__export_ps1
+PROMPT_COMMAND='__export_ps1'
+
