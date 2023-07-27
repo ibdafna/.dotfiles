@@ -1,6 +1,3 @@
-require('rose-pine').setup({
-    disable_background = true
-})
 
 require('dracula').setup({
   -- customize dracula color palette
