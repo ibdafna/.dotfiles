@@ -1,0 +1,18 @@
+alias m="micromamba"
+alias lll="ls -alt"
+alias ll="ls -alF"
+alias restart="source ~/.zshrc"
+alias k="kubectl"
+alias colors='for code in {000..255}; do print -P -- "$code: %F{$code}Color%f"; done'
+alias conda=m
+alias vim="nvim"
+
+# Cleanup
+alias drm="docker rm -vf $(docker ps -aq)"
+alias drmi="docker rmi -f $(docker images -aq)"
+alias gcb="git branch | grep -v 'main\|master' | xargs git branch -D"
+
+# Very personal
+alias mc="mv"
+alias fir="git"
+
