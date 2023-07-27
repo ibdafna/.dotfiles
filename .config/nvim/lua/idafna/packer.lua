@@ -15,14 +15,6 @@ return require('packer').startup(function(use)
   }
 
   use({
-	  'rose-pine/neovim',
-	  as = 'rose-pine',
-	  config = function()
-		  vim.cmd('colorscheme rose-pine')
-	  end
-  })
-
-  use({
       "folke/trouble.nvim",
       config = function()
           require("trouble").setup {
@@ -42,7 +34,6 @@ return require('packer').startup(function(use)
 			end,}
   use("nvim-treesitter/playground")
   use("theprimeagen/harpoon")
-  use("theprimeagen/refactoring.nvim")
   use("mbbill/undotree")
   use("tpope/vim-fugitive")
   use("nvim-treesitter/nvim-treesitter-context");
@@ -76,7 +67,6 @@ return require('packer').startup(function(use)
   use("laytan/cloak.nvim")
   use('Mofiqul/dracula.nvim')
   use("numToStr/Comment.nvim")
-
   use({"akinsho/toggleterm.nvim", tag = '*', config = function()
       require("toggleterm").setup()
     end})
