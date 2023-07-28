@@ -1,0 +1,23 @@
+#!/usr/bin/env zsh
+
+# Setup symlinks for sessionizer
+mkdir -p ~/.local/bin
+ln -s ~/.local/bin/tmux-sessionizer ./bin/tmux-sessionizer
+
+file_list=""
+
+if [ -n "$BASH_VERSION" ]; then
+  echo "I'm running in bash"
+  file_list="bash.txt"
+elif [ -n "$ZSH_VERSION" ]; then
+  echo "I'm running in zsh"
+  file_list="zsh.txt"
+fi
+
+
+for file in $(cat $file_list); do
+  if [ -f ~/$file ]; then
+    mv ~/$file ~/$file.bak;
+  fi;
+  ln -s ~/.dotfiles/$file ~/$file;
+done

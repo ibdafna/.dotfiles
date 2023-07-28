@@ -1,0 +1,3 @@
+.zshrc
+.zsh_aliases
+.zsh_ext

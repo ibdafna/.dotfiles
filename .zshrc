@@ -35,4 +35,5 @@ m activate base
 
 # Add copilot CLI to path
 export PATH=/Users/idafna/copilot-cli/node_modules/.bin/github-copilot-cli:$PATH
+export PATH=/Users/idafna/.local/bin/scripts/:$PATH
 
