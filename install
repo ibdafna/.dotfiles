@@ -2,7 +2,7 @@
 
 # Setup symlinks for sessionizer
 mkdir -p ~/.local/bin
-ln -s ~/.local/bin/tmux-sessionizer ./bin/tmux-sessionizer
+ln -s ~/.dotfiles/bin/tmux-sessionizer ~/.local/bin/tmux-sessionizer
 
 file_list=""
 

@@ -6,6 +6,7 @@ alias k="kubectl"
 alias colors='for code in {000..255}; do print -P -- "$code: %F{$code}Color%f"; done'
 alias conda=m
 alias vim="nvim"
+alias hi="tmux-sessionizer"
 
 # Cleanup
 alias drm="docker rm -vf $(docker ps -aq)"
@@ -17,4 +18,4 @@ alias mc="mv"
 alias fir="git"
 
 # Convenience
-alias ghc="/home/idafna/ghcopilot/node_modules/.bin/github-copilot-cli"
+alias ghc="~/copilot-cli/node_modules/.bin/github-copilot-cli"
