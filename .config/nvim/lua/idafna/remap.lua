@@ -1,4 +1,4 @@
-
+-- Leader key
 vim.g.mapleader = " "
 
 -- Open the file browser
@@ -35,6 +35,28 @@ vim.keymap.set("n", "<leader>sh", ":split<CR>")
 vim.keymap.set("n", "<leader>se", ":wincmd =<CR>")
 vim.keymap.set("n", "<leader>sx", ":close<CR>")
 
+-- Moving between splits
+function my_custom_function()
+    -- Get a single character of input from the user
+    local char = vim.fn.getchar()
+
+    -- Convert the ASCII value to a character
+    local char = vim.fn.nr2char(char)
+
+    -- Perform an action based on the input
+    if char == 'h' then
+        vim.cmd('wincmd h')
+    elseif char == 'j' then
+      vim.cmd('wincmd j')
+    elseif char == 'k' then
+      vim.cmd('wincmd k')
+    elseif char == 'l' then
+      vim.cmd('wincmd l')
+    end
+end
+
+vim.api.nvim_set_keymap('n', '<leader>m', ':lua my_custom_function()<CR>', {noremap = true, silent = true})
+
 -- Managing tabs
 vim.keymap.set("n", "<leader>to", ":tabnew<CR>")
 vim.keymap.set("n", "<leader>tx", ":tabclose<CR>")
@@ -66,7 +88,17 @@ vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
 -- Make the current file executable
 vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
 
+
+-- increment/decrement numbers
+vim.keymap.set("n", "<leader>+", "<C-a>") -- increment
+vim.keymap.set("n", "<leader>-", "<C-x>") -- decrement
+
 -- Source the current file
 vim.keymap.set("n", "<leader><leader>", function()
     vim.cmd("so")
 end)
+
+
+-- Extension mappings
+-- Toggle tree
+vim.keymap.set("n", "<leader>tt", ":NvimTreeToggle<CR>")
