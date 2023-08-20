@@ -71,5 +71,17 @@ return require('packer').startup(function(use)
       require("toggleterm").setup()
     end})
   use("christoomey/vim-tmux-navigator")
+
+  use({
+  "jackMort/ChatGPT.nvim",
+    config = function()
+      require("chatgpt").setup()
+    end,
+    requires = {
+      "MunifTanjim/nui.nvim",
+      "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope.nvim"
+    }
+  })
 end)
 
