@@ -7,3 +7,6 @@ This repo is meant to be cloned into your home directory, and from there you
 should be able to symlink the files to their relevant directories.
 
 If you see anything bad in here, do me a solid and open a PR 😄
+
+## Misc notes
+Some of the extensions assume patched fonts which allow for icons to be rendered as glyphs - are installed. These can be downloaded from [Nerd Fonts](https://www.nerdfonts.com/font-downloads)
