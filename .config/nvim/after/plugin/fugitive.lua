@@ -1,4 +1,3 @@
-vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
 
 local idafna_Fugitive = vim.api.nvim_create_augroup("idafna_Fugitive", {})
 

@@ -57,27 +57,17 @@ end
 
 vim.api.nvim_set_keymap('n', '<leader>m', ':lua my_custom_function()<CR>', {noremap = true, silent = true})
 
--- Managing tabs
-vim.keymap.set("n", "<leader>to", ":tabnew<CR>")
-vim.keymap.set("n", "<leader>tx", ":tabclose<CR>")
-vim.keymap.set("n", "<leader>tn", ":tabnext<CR>")
-vim.keymap.set("n", "<leader>tp", ":tabprevious<CR>")
-
 -- Deleting to the void register in normal and visual mode
 vim.keymap.set({"n", "v"}, "<leader>d", [["_d]])
 
 -- Noop for Q
 vim.keymap.set("n", "Q", "<nop>")
+
+-- Format code
 vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
 
--- General
+-- Exit insert mode
 vim.keymap.set("i", "jk", "<ESC>")
-
--- Move between quickfix and location list
-vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
-vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")
-vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")
-vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
 
 -- Shortcut for searching and replacing
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
@@ -85,17 +75,24 @@ vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><
 -- Switch between projects via tmux
 vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
 
--- Make the current file executable
-vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
-
-
--- increment/decrement numbers
-vim.keymap.set("n", "<leader>+", "<C-a>") -- increment
-vim.keymap.set("n", "<leader>-", "<C-x>") -- decrement
-
 -- Source the current file
 vim.keymap.set("n", "<leader><leader>", function()
     vim.cmd("so")
+end)
+
+-- Save the current file
+vim.keymap.set("n", "<leader>w", function()
+    vim.cmd("w")
+end)
+
+-- Save and quit
+vim.keymap.set("n", "<leader>q", function()
+    vim.cmd("wq")
+end)
+
+-- Quit without saving
+vim.keymap.set("n", "<leader>Q", function()
+    vim.cmd("q!")
 end)
 
 
@@ -104,3 +101,5 @@ end)
 vim.keymap.set("n", "<leader>tt", ":NvimTreeToggle<CR>")
 -- ChatGPT
 vim.keymap.set("n", "<leader>cg", ":ChatGPT<CR>")
+-- Vim Fugitive
+vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
