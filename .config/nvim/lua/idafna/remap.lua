@@ -102,3 +102,5 @@ end)
 -- Extension mappings
 -- Toggle tree
 vim.keymap.set("n", "<leader>tt", ":NvimTreeToggle<CR>")
+-- ChatGPT
+vim.keymap.set("n", "<leader>cg", ":ChatGPT<CR>")
