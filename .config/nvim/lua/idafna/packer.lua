@@ -20,7 +20,7 @@ return require('packer').startup(function(use)
       "folke/trouble.nvim",
       config = function()
           require("trouble").setup {
-              icons = false,
+              icons = true,
               -- your configuration comes here
               -- or leave it empty to use the default settings
               -- refer to the configuration section below
@@ -69,9 +69,6 @@ return require('packer').startup(function(use)
   use("laytan/cloak.nvim")
   use('Mofiqul/dracula.nvim')
   use("numToStr/Comment.nvim")
-  use({"akinsho/toggleterm.nvim", tag = '*', config = function()
-      require("toggleterm").setup()
-    end})
   use("christoomey/vim-tmux-navigator")
 
   use({
@@ -93,5 +90,6 @@ return require('packer').startup(function(use)
     },
   }
   use("APZelos/blamer.nvim")
+  use("tpope/vim-surround")
 end)
 
