@@ -92,5 +92,6 @@ return require('packer').startup(function(use)
       'nvim-tree/nvim-web-devicons', -- optional
     },
   }
+  use("APZelos/blamer.nvim")
 end)
 
