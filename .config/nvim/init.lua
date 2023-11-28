@@ -1,1 +1,2 @@
-require("idafna")
+require("idafna.core")
+require("idafna.lazy")
