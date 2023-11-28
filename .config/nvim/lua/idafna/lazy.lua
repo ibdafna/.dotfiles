@@ -12,9 +12,9 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({ { import = "idafna.plugins" }, { import = "idafna.plugins.lsp" } }, {
-	-- install = {
-	--   colorscheme = { "dracula" },
-	-- },
+	install = {
+		colorscheme = { "dracula" },
+	},
 	checker = {
 		enabled = true,
 		notify = false,
