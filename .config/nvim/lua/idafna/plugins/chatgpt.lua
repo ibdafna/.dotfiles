@@ -1,5 +1,8 @@
 return {
 	"jackMort/ChatGPT.nvim",
+	keys = {
+		{ "<leader>cc", "<cmd>ChatGPT<CR>", desc = "Open ChatGPT" },
+	},
 	config = function()
 		local chat_gpt = require("chatgpt")
 		chat_gpt.setup({

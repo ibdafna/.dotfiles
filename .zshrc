@@ -37,3 +37,4 @@ m activate base
 export PATH=/Users/idafna/copilot-cli/node_modules/.bin/github-copilot-cli:$PATH
 export PATH=/Users/idafna/.local/bin/:$PATH
 
+export PATH=$PATH:/Users/idafna/.pixi/bin
