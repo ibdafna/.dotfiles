@@ -41,15 +41,25 @@ vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
 vim.keymap.set("n", "<leader>Y", [["+Y]])
 
 -- Format code
-vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
+vim.keymap.set("n", "<leader>fm", vim.lsp.buf.format, { desc = "Format code" })
 
 -- Shortcut for searching and replacing
-vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+vim.keymap.set(
+	"n",
+	"<leader>s",
+	[[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
+	{ desc = "Search and replace" }
+)
 
 -- Switch between projects via tmux
-vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
+vim.keymap.set(
+	"n",
+	"<C-f>",
+	"<cmd>silent !tmux neww tmux-sessionizer<CR>",
+	{ desc = "Switch between projects via tmux" }
+)
 
 -- Save the current file
-vim.keymap.set("n", "<leader>w", function()
+vim.keymap.set("n", "<leader>ww", function()
 	vim.cmd("w")
 end)
