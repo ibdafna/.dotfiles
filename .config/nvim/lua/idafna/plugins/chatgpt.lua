@@ -8,10 +8,10 @@ return {
 		chat_gpt.setup({
 			api_key_cmd = "getopenaikey",
 			openai_params = {
-				model = "gpt-4",
+				model = "gpt-4o",
 			},
 			openai_edit_params = {
-				model = "gpt-4",
+				model = "gpt-4o",
 			},
 			keymaps = {
 				close = "<C-c>",

@@ -2,7 +2,7 @@ alias m="micromamba"
 alias lll="ls -alt"
 alias rshl="source ~/.bashrc"
 alias k="kubectl"
-alias vim="nvim"
+alias n="nvim"
 
 # Cleanup
 alias drm="docker rm -vf $(docker ps -aq)"
@@ -15,3 +15,6 @@ alias fir="git"
 
 # Convenience
 alias ghc="/home/idafna/ghcopilot/node_modules/.bin/github-copilot-cli"
+
+# Conda classic
+alias conda="/home/idafna/micromamba/envs/theia/bin/conda"
