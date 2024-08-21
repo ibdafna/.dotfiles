@@ -5,7 +5,6 @@ alias restart="source ~/.zshrc"
 alias k="kubectl"
 alias colors='for code in {000..255}; do print -P -- "$code: %F{$code}Color%f"; done'
 alias conda=m
-alias vim="nvim"
 alias hi="tmux-sessionizer"
 
 # Cleanup
