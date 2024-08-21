@@ -1,0 +1,13 @@
+import = [
+  "~/.config/alacritty/dracula-pro-van-helsing.toml"
+]
+
+[window]
+option_as_alt = 'Both'
+opacity = 1.0
+
+[font]
+normal = { family = "FiraCode Nerd Font", style = "Retina" }
+
+# [shell]
+# program = "/usr/local/bin/zellij"
