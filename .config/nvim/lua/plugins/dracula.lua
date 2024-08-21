@@ -1,10 +1,8 @@
 return {
-  { "dracula/vim", as = "dracula" },
-  -- Configure LazyVim to load gruvbox
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "dracula",
+      colorscheme = "dracula_pro_van_helsing",
     },
   },
 }
