@@ -36,5 +36,6 @@ m activate base
 # Add copilot CLI to path
 export PATH=/Users/idafna/copilot-cli/node_modules/.bin/github-copilot-cli:$PATH
 export PATH=/Users/idafna/.local/bin/:$PATH
-
 export PATH=$PATH:/Users/idafna/.pixi/bin
+export PATH=/opt/homebrew/bin:$PATH
+export EDITOR=nvim
