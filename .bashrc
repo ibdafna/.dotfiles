@@ -144,3 +144,8 @@ eval "$(starship init bash)"
 
 # Activate the default base conda environment
 micromamba activate base
+
+# We want to always start tmux
+if [ -n "$PS1" ] && [ -z "$TMUX" ]; then
+  tmux new-session -A -s main
+fi
