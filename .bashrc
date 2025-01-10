@@ -127,14 +127,14 @@ fi
 . "$HOME/.cargo/env"
 
 # >>> mamba initialize >>>
-# !! Contents within this block are managed by 'mamba init' !!
-export MAMBA_EXE='/home/idafna/.local/bin/micromamba'
-export MAMBA_ROOT_PREFIX='/home/idafna/micromamba'
-__mamba_setup="$("$MAMBA_EXE" shell hook --shell bash --root-prefix "$MAMBA_ROOT_PREFIX" 2>/dev/null)"
+# !! Contents within this block are managed by 'micromamba shell init' !!
+export MAMBA_EXE='/home/idafna/.local/bin/micromamba';
+export MAMBA_ROOT_PREFIX='/home/idafna/micromamba';
+__mamba_setup="$("$MAMBA_EXE" shell hook --shell bash --root-prefix "$MAMBA_ROOT_PREFIX" 2> /dev/null)"
 if [ $? -eq 0 ]; then
-  eval "$__mamba_setup"
+    eval "$__mamba_setup"
 else
-  alias micromamba="$MAMBA_EXE" # Fallback on help from mamba activate
+    alias micromamba="$MAMBA_EXE"  # Fallback on help from micromamba activate
 fi
 unset __mamba_setup
 # <<< mamba initialize <<<
@@ -145,7 +145,11 @@ eval "$(starship init bash)"
 # Activate the default base conda environment
 micromamba activate base
 
-# We want to always start tmux
-if [ -n "$PS1" ] && [ -z "$TMUX" ]; then
-  tmux new-session -A -s main
-fi
+# # We want to always start tmux
+# if [ -n "$PS1" ] && [ -z "$TMUX" ]; then
+#   tmux new-session -A -s main
+# fi
+#
+
+export PATH=$PATH:/usr/local/go/bin:/home/idafna/bin
+export ANTHROPIC_API_KEY=$(getanthropickey)
