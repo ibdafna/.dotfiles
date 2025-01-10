@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 
 # Setup symlinks for sessionizer
 mkdir -p ~/.local/bin
