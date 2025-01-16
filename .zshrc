@@ -26,7 +26,7 @@ else
 fi
 unset __mamba_setup
 # <<< mamba initialize <<<
-source /opt/homebrew/opt/spaceship/spaceship.zsh
+eval "$(starship init zsh)"
 
 source /Users/idafna/.docker/init-zsh.sh || true # Added by Docker Desktop
 
