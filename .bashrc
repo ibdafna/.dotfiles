@@ -128,18 +128,17 @@ fi
 
 # >>> mamba initialize >>>
 # !! Contents within this block are managed by 'micromamba shell init' !!
-export MAMBA_EXE='/home/idafna/.local/bin/micromamba';
-export MAMBA_ROOT_PREFIX='/home/idafna/micromamba';
-__mamba_setup="$("$MAMBA_EXE" shell hook --shell bash --root-prefix "$MAMBA_ROOT_PREFIX" 2> /dev/null)"
+export MAMBA_EXE='/home/idafna/.local/bin/micromamba'
+export MAMBA_ROOT_PREFIX='/home/idafna/micromamba'
+__mamba_setup="$("$MAMBA_EXE" shell hook --shell bash --root-prefix "$MAMBA_ROOT_PREFIX" 2>/dev/null)"
 if [ $? -eq 0 ]; then
-    eval "$__mamba_setup"
+  eval "$__mamba_setup"
 else
-    alias micromamba="$MAMBA_EXE"  # Fallback on help from micromamba activate
+  alias micromamba="$MAMBA_EXE" # Fallback on help from micromamba activate
 fi
 unset __mamba_setup
 # <<< mamba initialize <<<
 
-. /home/idafna/.wasmedge/env
 eval "$(starship init bash)"
 
 # Activate the default base conda environment
@@ -153,3 +152,14 @@ micromamba activate base
 
 export PATH=$PATH:/usr/local/go/bin:/home/idafna/bin
 export ANTHROPIC_API_KEY=$(getanthropickey)
+export OPENAI_API_KEY=$(getopenaikey)
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+alias claude="/home/idafna/.claude/local/claude"

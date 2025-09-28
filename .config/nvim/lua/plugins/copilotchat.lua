@@ -1,4 +1,5 @@
-return {
-  "CopilotC-Nvim/CopilotChat.nvim",
-  opts = { model = "o1" },
-}
+-- return {
+--   "CopilotC-Nvim/CopilotChat.nvim",
+--   opts = { model = "o1" },
+-- }
+return {}
