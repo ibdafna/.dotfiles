@@ -144,12 +144,6 @@ eval "$(starship init bash)"
 # Activate the default base conda environment
 micromamba activate base
 
-# # We want to always start tmux
-# if [ -n "$PS1" ] && [ -z "$TMUX" ]; then
-#   tmux new-session -A -s main
-# fi
-#
-
 export PATH=$PATH:/usr/local/go/bin:/home/idafna/bin
 export ANTHROPIC_API_KEY=$(getanthropickey)
 export OPENAI_API_KEY=$(getopenaikey)
@@ -162,4 +156,4 @@ export NVM_DIR="$HOME/.nvm"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-alias claude="/home/idafna/.claude/local/claude"
+[ -f $HOME/.sbn_aliases ] && source $HOME/.sbn_aliases

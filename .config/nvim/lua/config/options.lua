@@ -7,3 +7,6 @@ vim.wo.relativenumber = true
 
 -- map jk to escape
 vim.api.nvim_set_keymap("i", "jk", "<Esc>", { noremap = true, silent = true })
+
+-- disable all animations
+vim.g.snacks_animate = false
