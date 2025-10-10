@@ -1,22 +1,77 @@
 #!/usr/bin/env bash
 
-# Setup symlinks for sessionizer
+set -e  # Exit on error
+
+echo "Setting up dotfiles..."
+
 mkdir -p ~/.local/bin
+if [ -e ~/.local/bin/tmux-sessionizer ]; then
+  rm ~/.local/bin/tmux-sessionizer
+fi
 ln -s ~/.dotfiles/bin/tmux-sessionizer ~/.local/bin/tmux-sessionizer
+echo "✓ tmux-sessionizer linked"
 
-file_list=""
-
-if [ -n "$BASH_VERSION" ]; then
-  echo "I'm running in bash"
-  file_list="bash.txt"
-elif [ -n "$ZSH_VERSION" ]; then
-  echo "I'm running in zsh"
-  file_list="zsh.txt"
+if [ -d ~/.dotfiles/.config ]; then
+  if [ -e ~/.config ] && [ ! -L ~/.config ]; then
+    backup=~/.config.bak
+    if [ -e "$backup" ]; then
+      backup=~/.config.bak.$(date +%s)
+    fi
+    mv ~/.config "$backup"
+    echo "  Backed up .config to $backup"
+  elif [ -L ~/.config ]; then
+    # Remove existing symlink
+    rm ~/.config
+  fi
+  ln -s ~/.dotfiles/.config ~/.config
+  echo "✓ .config linked"
 fi
 
-for file in $(cat $file_list); do
-  if [ -f ~/$file ]; then
-    mv ~/$file ~/$file.bak
+user_shell=$(basename "$SHELL")
+file_list=""
+
+if [ "$user_shell" = "bash" ]; then
+  echo "Detected bash as default shell"
+  file_list="bash.txt"
+elif [ "$user_shell" = "zsh" ]; then
+  echo "Detected zsh as default shell"
+  file_list="zsh.txt"
+else
+  echo "Error: Unsupported default shell: $user_shell (expected bash or zsh)"
+  exit 1
+fi
+
+if [ ! -f ~/.dotfiles/"$file_list" ]; then
+  echo "Error: ~/.dotfiles/$file_list not found"
+  exit 1
+fi
+
+while IFS= read -r file || [ -n "$file" ]; do
+  [[ -z "$file" || "$file" =~ ^# ]] && continue
+  
+  target=~/"$file"
+  source=~/.dotfiles/"$file"
+  
+  if [ ! -f "$source" ]; then
+    echo "Warning: $source not found, skipping..."
+    continue
   fi
-  ln -s ~/.dotfiles/$file ~/$file
-done
+  
+  if [ -f "$target" ] && [ ! -L "$target" ]; then
+    backup="$target.bak"
+    if [ -e "$backup" ]; then
+      backup="$target.bak.$(date +%s)"
+    fi
+    mv "$target" "$backup"
+    echo "  Backed up $file to $backup"
+  fi
+  
+  if [ -L "$target" ]; then
+    rm "$target"
+  fi
+  
+  ln -s "$source" "$target"
+  echo "✓ Linked $file"
+done < ~/.dotfiles/"$file_list"
+
+echo "Done!"
