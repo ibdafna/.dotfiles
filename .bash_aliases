@@ -1,4 +1,3 @@
-alias m="micromamba"
 alias lll="ls -alt"
 alias rshl="source ~/.bashrc"
 alias k="kubectl"
@@ -12,6 +11,3 @@ alias gcb="git branch | grep -v 'main\|master' | xargs git branch -D"
 # Very personal
 alias mc="mv"
 alias fir="git"
-
-# Conda classic
-alias conda="/home/idafna/micromamba/envs/theia/bin/conda"

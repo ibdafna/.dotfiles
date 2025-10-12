@@ -15,6 +15,3 @@ alias gcb="git branch | grep -v 'main\|master' | xargs git branch -D"
 # Very personal
 alias mc="mv"
 alias fir="git"
-
-# Convenience
-alias ghc="~/copilot-cli/node_modules/.bin/github-copilot-cli"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e  # Exit on error
+set -e
 
 echo "Setting up dotfiles..."
 
@@ -20,7 +20,6 @@ if [ -d ~/.dotfiles/.config ]; then
     mv ~/.config "$backup"
     echo "  Backed up .config to $backup"
   elif [ -L ~/.config ]; then
-    # Remove existing symlink
     rm ~/.config
   fi
   ln -s ~/.dotfiles/.config ~/.config

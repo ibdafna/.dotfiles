@@ -20,3 +20,4 @@ cursor-color = #708CA9
 cursor-text = #708CA9
 selection-background = #414D58
 selection-foreground = #F8F8F2
+font-family = "FiraCode Nerd Font"
