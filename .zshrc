@@ -1,5 +1,7 @@
 export TERM="xterm-256color"
 
+export PATH="$HOME/bin:$PATH"
+
 if [ -f ~/.zsh_aliases ]; then
     . ~/.zsh_aliases
 fi

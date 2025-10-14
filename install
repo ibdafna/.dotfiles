@@ -4,11 +4,11 @@ set -e
 
 echo "Setting up dotfiles..."
 
-mkdir -p ~/.local/bin
-if [ -e ~/.local/bin/tmux-sessionizer ]; then
-  rm ~/.local/bin/tmux-sessionizer
+mkdir -p ~/bin
+if [ -e ~/bin/tmux-sessionizer ]; then
+  rm ~/bin/tmux-sessionizer
 fi
-ln -s ~/.dotfiles/bin/tmux-sessionizer ~/.local/bin/tmux-sessionizer
+ln -s ~/.dotfiles/bin/tmux-sessionizer ~/bin/tmux-sessionizer
 echo "✓ tmux-sessionizer linked"
 
 if [ -d ~/.dotfiles/.config ]; then
