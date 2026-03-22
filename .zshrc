@@ -1,13 +1,17 @@
 export TERM="xterm-256color"
 
-export PATH="$HOME/bin:$PATH"
+for dir in "$HOME/bin" "$HOME/.local/bin" "$HOME/.pixi/bin" "/opt/homebrew/bin"; do
+    if [ -d "$dir" ]; then
+        export PATH="$dir:$PATH"
+    fi
+done
 
-if [ -f ~/.zsh_aliases ]; then
-    . ~/.zsh_aliases
+if [ -f "$HOME/.zsh_aliases" ]; then
+    . "$HOME/.zsh_aliases"
 fi
 
-if [ -f ~/.zsh_ext ]; then
-    . ~/.zsh_ext
+if [ -f "$HOME/.zsh_ext" ]; then
+    . "$HOME/.zsh_ext"
 fi
 
 # Used for git ops
@@ -20,6 +24,8 @@ export SDKMAN_DIR="$HOME/.sdkman"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-[ -f $HOME/.sbn_aliases ] && source $HOME/.sbn_aliases
+[ -f "$HOME/.sbn_aliases" ] && source "$HOME/.sbn_aliases"
 
-eval "$(starship init zsh)"
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init zsh)"
+fi

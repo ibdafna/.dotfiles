@@ -1,16 +1,22 @@
-alias m="micromamba"
 alias lll="ls -alt"
 alias ll="ls -alF"
 alias restart="source ~/.zshrc"
 alias k="kubectl"
 alias colors='for code in {000..255}; do print -P -- "$code: %F{$code}Color%f"; done'
-alias conda=m
 alias hi="tmux-sessionizer"
 
 # Cleanup
-alias drm="docker rm -vf $(docker ps -aq)"
-alias drmi="docker rmi -f $(docker images -aq)"
 alias gcb="git branch | grep -v 'main\|master' | xargs git branch -D"
+
+drm() {
+  command -v docker >/dev/null 2>&1 || return 0
+  docker rm -vf $(docker ps -aq)
+}
+
+drmi() {
+  command -v docker >/dev/null 2>&1 || return 0
+  docker rmi -f $(docker images -aq)
+}
 
 # Very personal
 alias mc="mv"

@@ -1,76 +1,261 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
-echo "Setting up dotfiles..."
+DOTFILES_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+BACKUP_SUFFIX=".bak.$(date +%Y%m%d%H%M%S)"
 
-mkdir -p ~/bin
-if [ -e ~/bin/tmux-sessionizer ]; then
-  rm ~/bin/tmux-sessionizer
-fi
-ln -s ~/.dotfiles/bin/tmux-sessionizer ~/bin/tmux-sessionizer
-echo "✓ tmux-sessionizer linked"
+usage() {
+  cat <<'EOF'
+Usage: ./install [--install-deps] [--bootstrap-plugins] [bash|zsh|all]
 
-if [ -d ~/.dotfiles/.config ]; then
-  if [ -e ~/.config ] && [ ! -L ~/.config ]; then
-    backup=~/.config.bak
-    if [ -e "$backup" ]; then
-      backup=~/.config.bak.$(date +%s)
+Installs shared config plus shell-specific dotfiles.
+When no shell is provided, the installer uses the current login shell from $SHELL.
+
+Options:
+  --install-deps       Install core dependencies with Homebrew if available
+  --bootstrap-plugins  Install tmux TPM and run a headless Neovim plugin sync
+EOF
+}
+
+warn_if_missing_command() {
+  local command_name="$1"
+  local message="$2"
+
+  if ! command -v "$command_name" >/dev/null 2>&1; then
+    echo "Warning: missing $command_name. $message" >&2
+  fi
+}
+
+install_homebrew_packages() {
+  if ! command -v brew >/dev/null 2>&1; then
+    echo "Warning: Homebrew is not installed. Skipping dependency installation." >&2
+    return
+  fi
+
+  local packages=(
+    "git"
+    "neovim"
+    "tmux"
+    "fzf"
+    "ripgrep"
+    "fd"
+    "starship"
+  )
+
+  echo "Installing core dependencies with Homebrew..."
+  brew install "${packages[@]}"
+}
+
+bootstrap_tpm() {
+  local tpm_dir="$HOME/.tmux/plugins/tpm"
+
+  if [[ -d "$tpm_dir/.git" ]]; then
+    echo "TPM already installed: $tpm_dir"
+    return
+  fi
+
+  mkdir -p "$(dirname "$tpm_dir")"
+  git clone https://github.com/tmux-plugins/tpm "$tpm_dir"
+  echo "Installed TPM at $tpm_dir"
+}
+
+bootstrap_nvim_plugins() {
+  if ! command -v nvim >/dev/null 2>&1; then
+    echo "Warning: nvim is not installed. Skipping plugin bootstrap." >&2
+    return
+  fi
+
+  echo "Bootstrapping Neovim plugins..."
+  nvim --headless "+Lazy! sync" +qa
+}
+
+read_manifest() {
+  local manifest="$1"
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ -z "$line" || "$line" =~ ^# ]] && continue
+    printf '%s\n' "$line"
+  done < "$manifest"
+}
+
+backup_target() {
+  local target="$1"
+  local backup_path="${target}${BACKUP_SUFFIX}"
+
+  if [[ -e "$backup_path" || -L "$backup_path" ]]; then
+    echo "Backup path already exists: $backup_path" >&2
+    exit 1
+  fi
+
+  mv "$target" "$backup_path"
+  echo "Backed up $target to $backup_path"
+}
+
+link_path() {
+  local source="$1"
+  local target="$2"
+
+  mkdir -p "$(dirname "$target")"
+
+  if [[ -L "$target" ]]; then
+    local current_target
+    current_target="$(readlink "$target")"
+
+    if [[ "$current_target" == "$source" ]]; then
+      echo "Already linked: $target"
+      return
     fi
-    mv ~/.config "$backup"
-    echo "  Backed up .config to $backup"
-  elif [ -L ~/.config ]; then
-    rm ~/.config
   fi
-  ln -s ~/.dotfiles/.config ~/.config
-  echo "✓ .config linked"
-fi
 
-user_shell=$(basename "$SHELL")
-file_list=""
-
-if [ "$user_shell" = "bash" ]; then
-  echo "Detected bash as default shell"
-  file_list="bash.txt"
-elif [ "$user_shell" = "zsh" ]; then
-  echo "Detected zsh as default shell"
-  file_list="zsh.txt"
-else
-  echo "Error: Unsupported default shell: $user_shell (expected bash or zsh)"
-  exit 1
-fi
-
-if [ ! -f ~/.dotfiles/"$file_list" ]; then
-  echo "Error: ~/.dotfiles/$file_list not found"
-  exit 1
-fi
-
-while IFS= read -r file || [ -n "$file" ]; do
-  [[ -z "$file" || "$file" =~ ^# ]] && continue
-  
-  target=~/"$file"
-  source=~/.dotfiles/"$file"
-  
-  if [ ! -f "$source" ]; then
-    echo "Warning: $source not found, skipping..."
-    continue
+  if [[ -e "$target" || -L "$target" ]]; then
+    backup_target "$target"
   fi
-  
-  if [ -f "$target" ] && [ ! -L "$target" ]; then
-    backup="$target.bak"
-    if [ -e "$backup" ]; then
-      backup="$target.bak.$(date +%s)"
-    fi
-    mv "$target" "$backup"
-    echo "  Backed up $file to $backup"
-  fi
-  
-  if [ -L "$target" ]; then
-    rm "$target"
-  fi
-  
+
   ln -s "$source" "$target"
-  echo "✓ Linked $file"
-done < ~/.dotfiles/"$file_list"
+  echo "Linked $target -> $source"
+}
 
-echo "Done!"
+link_optional_path() {
+  local relative_source="$1"
+  local target="$2"
+
+  if [[ -e "$DOTFILES_DIR/$relative_source" || -L "$DOTFILES_DIR/$relative_source" ]]; then
+    link_path "$DOTFILES_DIR/$relative_source" "$target"
+  fi
+}
+
+link_optional_children() {
+  local relative_source_dir="$1"
+  local target_dir="$2"
+
+  if [[ ! -d "$DOTFILES_DIR/$relative_source_dir" ]]; then
+    return
+  fi
+
+  mkdir -p "$target_dir"
+
+  local child
+  for child in "$DOTFILES_DIR/$relative_source_dir"/*; do
+    [[ -e "$child" ]] || continue
+    link_path "$child" "$target_dir/$(basename "$child")"
+  done
+}
+
+link_config_children() {
+  local source_dir="$DOTFILES_DIR/.config"
+
+  if [[ ! -d "$source_dir" ]]; then
+    return
+  fi
+
+  mkdir -p "$HOME/.config"
+
+  local child
+  for child in "$source_dir"/*; do
+    [[ -e "$child" ]] || continue
+    link_path "$child" "$HOME/.config/$(basename "$child")"
+  done
+}
+
+shell_name=""
+install_deps=false
+bootstrap_plugins=false
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    bash|zsh|all)
+      if [[ -n "$shell_name" ]]; then
+        echo "Shell already specified: $shell_name" >&2
+        exit 1
+      fi
+      shell_name="$1"
+      ;;
+    --install-deps)
+      install_deps=true
+      ;;
+    --bootstrap-plugins)
+      bootstrap_plugins=true
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unsupported argument: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+
+  shift
+done
+
+if [[ -z "$shell_name" ]]; then
+  shell_name="$(basename "${SHELL:-}")"
+fi
+
+case "$shell_name" in
+  bash|zsh|all)
+    ;;
+  *)
+    echo "Unable to infer a supported shell from \$SHELL=${SHELL:-unset}" >&2
+    echo "Run ./install bash, ./install zsh, or ./install all." >&2
+    exit 1
+    ;;
+esac
+
+if [[ "$install_deps" == true ]]; then
+  install_homebrew_packages
+fi
+
+warn_if_missing_command "nvim" "Neovim config will be linked, but the editor is not installed."
+warn_if_missing_command "tmux" "tmux-sessionizer depends on tmux."
+warn_if_missing_command "fzf" "tmux-sessionizer depends on fzf."
+warn_if_missing_command "rg" "Telescope live_grep depends on ripgrep."
+warn_if_missing_command "fd" "Telescope file discovery works better with fd."
+warn_if_missing_command "starship" "Shell prompt initialization expects starship."
+warn_if_missing_command "make" "Some Neovim plugins require make during bootstrap."
+
+link_config_children
+link_path "$DOTFILES_DIR/bin/tmux-sessionizer" "$HOME/.local/bin/tmux-sessionizer"
+link_path "$DOTFILES_DIR/bin/tmux-sessionizer" "$HOME/bin/tmux-sessionizer"
+
+link_optional_path ".ai/claude/settings.json" "$HOME/.claude/settings.json"
+link_optional_path ".ai/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+link_optional_children ".ai/claude/skills" "$HOME/.claude/skills"
+link_optional_children ".ai/claude/subagents" "$HOME/.claude/subagents"
+
+link_optional_path ".ai/gemini/settings.json" "$HOME/.gemini/settings.json"
+link_optional_path ".ai/gemini/GEMINI.md" "$HOME/.gemini/GEMINI.md"
+link_optional_children ".ai/gemini/commands" "$HOME/.gemini/commands"
+link_optional_children ".ai/gemini/extensions" "$HOME/.gemini/extensions"
+
+link_optional_path ".ai/codex/config.toml" "$HOME/.codex/config.toml"
+link_optional_children ".ai/codex/skills" "$HOME/.codex/skills"
+
+install_shell_manifest() {
+  local manifest="$1"
+
+  while IFS= read -r file; do
+    link_path "$DOTFILES_DIR/$file" "$HOME/$file"
+  done < <(read_manifest "$DOTFILES_DIR/$manifest")
+}
+
+case "$shell_name" in
+  bash)
+    install_shell_manifest "bash.txt"
+    ;;
+  zsh)
+    install_shell_manifest "zsh.txt"
+    ;;
+  all)
+    install_shell_manifest "bash.txt"
+    install_shell_manifest "zsh.txt"
+    ;;
+esac
+
+if [[ "$bootstrap_plugins" == true ]]; then
+  bootstrap_tpm
+  bootstrap_nvim_plugins
+fi

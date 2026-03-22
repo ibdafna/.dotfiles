@@ -91,8 +91,12 @@ alias ll='ls -alFH'
 alias la='ls -A'
 alias l='ls -CF'
 
-# Neovim installation
-export PATH="/opt/nvim-linux64/bin:$PATH"
+for dir in "$HOME/bin" "$HOME/.local/bin" "$HOME/.pixi/bin" "/opt/homebrew/bin" "/opt/nvim-linux64/bin"; do
+  if [ -d "$dir" ]; then
+    export PATH="$dir:$PATH"
+  fi
+done
+
 export EDITOR=nvim
 
 # Add an "alert" alias for long running commands.  Use like so:
@@ -124,29 +128,27 @@ if [ -f ~/.bash_ext ]; then
   . ~/.bash_ext
 fi
 
-. "$HOME/.cargo/env"
-
-# >>> mamba initialize >>>
-# !! Contents within this block are managed by 'micromamba shell init' !!
-export MAMBA_EXE='/home/idafna/.local/bin/micromamba'
-export MAMBA_ROOT_PREFIX='/home/idafna/micromamba'
-__mamba_setup="$("$MAMBA_EXE" shell hook --shell bash --root-prefix "$MAMBA_ROOT_PREFIX" 2>/dev/null)"
-if [ $? -eq 0 ]; then
-  eval "$__mamba_setup"
-else
-  alias micromamba="$MAMBA_EXE" # Fallback on help from micromamba activate
+if [ -f "$HOME/.cargo/env" ]; then
+  . "$HOME/.cargo/env"
 fi
-unset __mamba_setup
-# <<< mamba initialize <<<
 
-eval "$(starship init bash)"
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init bash)"
+fi
 
-# Activate the default base conda environment
-micromamba activate base
+for dir in "/usr/local/go/bin" "$HOME/bin"; do
+  if [ -d "$dir" ]; then
+    export PATH="$dir:$PATH"
+  fi
+done
 
-export PATH=$PATH:/usr/local/go/bin:/home/idafna/bin
-export ANTHROPIC_API_KEY=$(getanthropickey)
-export OPENAI_API_KEY=$(getopenaikey)
+if command -v getanthropickey >/dev/null 2>&1; then
+  export ANTHROPIC_API_KEY="$(getanthropickey)"
+fi
+
+if command -v getopenaikey >/dev/null 2>&1; then
+  export OPENAI_API_KEY="$(getopenaikey)"
+fi
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
@@ -156,4 +158,4 @@ export NVM_DIR="$HOME/.nvm"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-[ -f $HOME/.sbn_aliases ] && source $HOME/.sbn_aliases
+[ -f "$HOME/.sbn_aliases" ] && source "$HOME/.sbn_aliases"

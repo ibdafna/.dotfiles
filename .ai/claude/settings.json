@@ -1,0 +1,8 @@
+{
+  "skipDangerousModePermissionPrompt": true,
+  "permissions": {
+    "defaultMode": "bypassPermissions"
+  },
+  "includeCoAuthoredBy": false,
+  "outputStyle": "insights"
+}

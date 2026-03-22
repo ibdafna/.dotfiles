@@ -5,8 +5,57 @@ is inspired by the configs from [ThePrimeagen](https://github.com/ThePrimeagen/.
 
 ## How to use these files
 
-This repo is meant to be cloned into your home directory, and from there you
-should be able to symlink the files to their relevant directories.
+Clone the repo anywhere, then run:
+
+```bash
+./install
+```
+
+The installer now:
+
+- Symlinks each top-level config directory from `.config/` into `~/.config/`
+- Symlinks `bin/tmux-sessionizer` into both `~/.local/bin` and `~/bin`
+- Installs shell-specific files based on your login shell in `$SHELL`
+- Backs up conflicting files and directories before replacing them
+
+You can also force a specific shell:
+
+```bash
+./install bash
+./install zsh
+./install all
+```
+
+To install core macOS dependencies and bootstrap plugin managers:
+
+```bash
+./install --install-deps --bootstrap-plugins zsh
+```
+
+This currently installs core packages with Homebrew:
+
+- `git`
+- `neovim`
+- `tmux`
+- `fzf`
+- `ripgrep`
+- `fd`
+- `starship`
+
+The repo can also manage portable AI CLI config under `.ai/`:
+
+- `.ai/claude/settings.json` -> `~/.claude/settings.json`
+- `.ai/claude/CLAUDE.md` -> `~/.claude/CLAUDE.md`
+- `.ai/claude/skills/*` -> `~/.claude/skills/*`
+- `.ai/claude/subagents/*` -> `~/.claude/subagents/*`
+- `.ai/gemini/settings.json` -> `~/.gemini/settings.json`
+- `.ai/gemini/GEMINI.md` -> `~/.gemini/GEMINI.md`
+- `.ai/gemini/commands/*` -> `~/.gemini/commands/*`
+- `.ai/gemini/extensions/*` -> `~/.gemini/extensions/*`
+- `.ai/codex/config.toml` -> `~/.codex/config.toml`
+- `.ai/codex/skills/*` -> `~/.codex/skills/*`
+
+Only portable config should live there. Do not commit auth, session history, caches, or other tool-managed state.
 
 If you see anything bad in here, do me a solid and open a PR 😄
 
@@ -14,6 +63,12 @@ If you see anything bad in here, do me a solid and open a PR 😄
 
 Some of the extensions assume patched fonts which allow for icons to be rendered as glyphs - are installed. These can be downloaded from [Nerd Fonts](https://www.nerdfonts.com/font-downloads)
 
-## [Update 2024-08-20]
+`tmux-sessionizer` expects `tmux` and `fzf` to be installed, and it searches for projects under `~/dev` and `~/dfx`.
 
-I thought I'd try out LazyVim + Zellij. I quickly reverted Zellij, but giving LazyVim a real chance. My "manual" `nvim` config is in the `nvim_bak` folder for now.
+The Neovim config also assumes:
+
+- `git` so the plugin manager can clone plugins
+- `ripgrep` for Telescope live grep
+- `make` so `telescope-fzf-native.nvim` can build
+
+Some integrations are still optional and are not bootstrapped automatically, including `getopenaikey` for ChatGPT-style plugins and any extra local tools you may layer on top of these dotfiles.
