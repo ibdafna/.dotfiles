@@ -19,7 +19,7 @@ Codex is the GPT-family counterpart of the `antigravity` skill (Gemini family). 
 
 `codex` is a CLI built for humans first: bare `codex` opens a TUI. Every command you run must be one that finishes on its own and puts its whole answer on stdout or in a file you then read in full. You never see a terminal; anything that waits for a keypress, opens a picker, or streams a partial answer hangs your turn or hands you a truncated result. The `cli-for-agents` skill is the general guide to running CLIs this way; read it once, then apply these `codex` specifics:
 
-- **Only two entry points: `codex exec` and `codex review`.** Never run bare `codex`, `codex resume`, `codex fork` (both open a session picker), `codex cloud`, `codex app`, `codex login`, or `codex update`. Follow-ups go through `codex exec resume <session-id> "<prompt>"`, which is non-interactive.
+- **Only two entry points: `codex exec` and `codex review`.** Never run bare `codex`, `codex resume`, `codex fork` (both open a session picker), `codex cloud`, `codex app`, `codex login`, or `codex update`. Follow-ups go through `codex exec resume <session-id> "<prompt>"`, which is non-interactive; re-pass `-c approval_policy=never -c sandbox_mode=read-only` on it, because a resume takes its policy from the base config, not from the original run.
 - **Always `</dev/null`** (or feed the prompt on stdin, see below). When stdin is not a terminal, `codex exec` reads it and appends it to the prompt; an open pipe stalls the run.
 - **Never rely on approvals.** Pass `-c approval_policy=never` and an explicit sandbox: `-s read-only` for review, consult, and research; `-s workspace-write` when you want edits applied. There is nobody to answer an approval prompt.
 - **Capture the whole answer, then read it whole.** stdout carries only the agent's final message; the header, transcript, and token count go to stderr. Use `-o <file>` to write the final message to a file as well, redirect stderr to a log, wait for the process to exit, then read the file. Do not `tail` a running job and act on a partial answer.
@@ -186,7 +186,7 @@ For findings you will parse, add `--output-schema $OUT/findings.schema.json`.
 OUT=$(mktemp -d)
 codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<question>" </dev/null 2>$OUT/log.txt
 SID=$(grep -o 'session id: .*' $OUT/log.txt | awk '{print $3}')
-codex exec resume --skip-git-repo-check "$SID" "<follow-up>" </dev/null 2>$OUT/log2.txt
+codex exec resume --skip-git-repo-check -c approval_policy=never -c sandbox_mode=read-only "$SID" "<follow-up>" </dev/null 2>$OUT/log2.txt
 ```
 
 Do not add `--ephemeral` to a run you may want to resume.

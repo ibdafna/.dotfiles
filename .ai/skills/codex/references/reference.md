@@ -18,7 +18,7 @@ Complete flag and subcommand reference for the OpenAI Codex CLI, verified agains
 | `--output-schema <file>` | JSON Schema file describing the final response shape. |
 | `--json` | Print events to stdout as JSONL instead of the final message. |
 | `--color always\|never\|auto` | Color settings (default `auto`). |
-| `-p`, `--profile <name>` | Layer `codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only_HOME/<name>.config.toml` on top of the base config. |
+| `-p`, `--profile <name>` | Layer `$CODEX_HOME/<name>.config.toml` on top of the base config. |
 | `--enable <feature>` / `--disable <feature>` | Feature flag toggles (`codex features` lists them). |
 | `--strict-config` | Error out on unrecognized `config.toml` fields. |
 | `--ignore-user-config` | Do not load `$CODEX_HOME/config.toml` (auth still uses `CODEX_HOME`). |
@@ -35,7 +35,7 @@ Complete flag and subcommand reference for the OpenAI Codex CLI, verified agains
 codex exec resume [OPTIONS] [SESSION_ID] [PROMPT]
 ```
 
-`SESSION_ID` is the UUID printed as `session id:` on stderr by the original run (or a thread name). `--last` picks the newest session recorded for the current directory; `--all` disables that cwd filter. `PROMPT` as `-` reads stdin. Takes the same `-c`, `-i`, `--enable/--disable`, `--strict-config` options; add `--skip-git-repo-check` outside a repository. Not available for `--ephemeral` sessions.
+`SESSION_ID` is the UUID printed as `session id:` on stderr by the original run (or a thread name). `--last` picks the newest session recorded for the current directory; `--all` disables that cwd filter. `PROMPT` as `-` reads stdin. Takes the same `-c`, `-i`, `--enable/--disable`, `--strict-config` options; add `--skip-git-repo-check` outside a repository. The original run's overrides do not carry over: re-pass `-c approval_policy=never -c sandbox_mode=read-only` (there is no `-s` on resume). Not available for `--ephemeral` sessions.
 
 ## `codex review` flags
 
@@ -148,7 +148,7 @@ Read the file after exit; the last `agent_message` item is the answer.
 OUT=$(mktemp -d)
 codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<question>" </dev/null 2>$OUT/log.txt
 SID=$(grep -o 'session id: .*' $OUT/log.txt | awk '{print $3}')
-codex exec resume --skip-git-repo-check "$SID" "<follow-up>" </dev/null 2>$OUT/log2.txt
+codex exec resume --skip-git-repo-check -c approval_policy=never -c sandbox_mode=read-only "$SID" "<follow-up>" </dev/null 2>$OUT/log2.txt
 ```
 
 ### Background long-running job
