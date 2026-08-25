@@ -32,7 +32,7 @@ pstack runs on Cursor (IDE and CLI), Claude Code, and Codex CLI. The skills desc
 | pstack model config | `~/.agents/pstack/models.md` (see `models.md`) | same | same |
 | pstack agent definitions (`rigorous-agent.md`, `comment-sicko.md`) | `~/.cursor/agents/` | `~/.claude/agents/` | `~/.codex/agents/` |
 
-Antigravity (`agy`) also reads these skills, from `~/.gemini/config/skills/` (personal) or `<workspace>/.agents/skills/` (project); its agents are `~/.gemini/config/agents/<name>/agent.md`. Treat it like Codex in the capability map: no per-spawn model parameter, `--model` on the CLI instead.
+Antigravity also reads these skills: the CLI (`agy`) from `~/.gemini/config/skills/`, the IDE from `~/.gemini/antigravity/skills/`, both from `<workspace>/.agents/skills/` (project); its agents are `~/.gemini/config/agents/<name>/agent.md`. Treat it like Codex in the capability map: no per-spawn model parameter, `--model` on the CLI instead.
 
 Transcript rules hold on every harness. Read only the active workspace's transcripts. Never glob across other projects' directories; that reads private chats from unrelated work. Order candidates by modification time (`ls -t`), never by id.
 
