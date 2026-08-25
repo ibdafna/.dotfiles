@@ -90,22 +90,25 @@ Every example uses the full read-only command (no `$PREFIX` variable: zsh does n
 ### Non-interactive prompt
 
 ```bash
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o /tmp/codex-out.md "<prompt>" </dev/null 2>/tmp/codex-log.txt
-cat /tmp/codex-out.md
+OUT=$(mktemp -d)
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<prompt>" </dev/null 2>$OUT/log.txt
+cat $OUT/out.md
 ```
 
 ### Prompt from a file (long prompts, diffs, plans)
 
 ```bash
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o /tmp/codex-out.md - < /tmp/prompt.md 2>/tmp/codex-log.txt
+OUT=$(mktemp -d)
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md - < $OUT/prompt.md 2>$OUT/log.txt
 ```
 
 ### Edits applied in a repository
 
 ```bash
+OUT=$(mktemp -d)
 codex exec --color never -c approval_policy=never -s workspace-write -C /path/to/repo \
-  -o /tmp/codex-out.md "<task>. Apply edits directly. Do not ask for confirmation." \
-  </dev/null 2>/tmp/codex-log.txt
+  -o $OUT/out.md "<task>. Apply edits directly. Do not ask for confirmation." \
+  </dev/null 2>$OUT/log.txt
 git -C /path/to/repo status --short
 ```
 
@@ -118,21 +121,23 @@ codex exec ... -s workspace-write -C /path/to/repo-a --add-dir /path/to/repo-b "
 ### Structured output
 
 ```bash
-cat > /tmp/findings.schema.json <<'JSON'
+OUT=$(mktemp -d)
+cat > $OUT/findings.schema.json <<'JSON'
 {"type":"object","properties":{"findings":{"type":"array","items":{"type":"object",
  "properties":{"file":{"type":"string"},"line":{"type":"integer"},
  "severity":{"type":"string","enum":["HIGH","MED","LOW"]},"note":{"type":"string"}},
  "required":["file","line","severity","note"],"additionalProperties":false}}},
  "required":["findings"],"additionalProperties":false}
 JSON
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only --output-schema /tmp/findings.schema.json -o /tmp/codex-out.json - < /tmp/prompt.md 2>/tmp/codex-log.txt
-jq . /tmp/codex-out.json
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only --output-schema $OUT/findings.schema.json -o $OUT/out.json - < $OUT/prompt.md 2>$OUT/log.txt
+jq . $OUT/out.json
 ```
 
 ### Event stream
 
 ```bash
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only --json "<prompt>" </dev/null 2>/tmp/codex-log.txt > /tmp/codex-events.jsonl
+OUT=$(mktemp -d)
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only --json "<prompt>" </dev/null 2>$OUT/log.txt > $OUT/events.jsonl
 ```
 
 Read the file after exit; the last `agent_message` item is the answer.
@@ -140,18 +145,20 @@ Read the file after exit; the last `agent_message` item is the answer.
 ### Continue a conversation
 
 ```bash
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o /tmp/codex-out.md "<question>" </dev/null 2>/tmp/codex-log.txt
-SID=$(grep -o 'session id: .*' /tmp/codex-log.txt | awk '{print $3}')
-codex exec resume --skip-git-repo-check "$SID" "<follow-up>" </dev/null 2>/tmp/codex-log2.txt
+OUT=$(mktemp -d)
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<question>" </dev/null 2>$OUT/log.txt
+SID=$(grep -o 'session id: .*' $OUT/log.txt | awk '{print $3}')
+codex exec resume --skip-git-repo-check "$SID" "<follow-up>" </dev/null 2>$OUT/log2.txt
 ```
 
 ### Background long-running job
 
 ```bash
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o /tmp/codex-out.md "<prompt>" </dev/null 2>/tmp/codex-log.txt &
+OUT=$(mktemp -d)
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<prompt>" </dev/null 2>$OUT/log.txt &
 CODEX_PID=$!
-wait codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only_PID
-cat /tmp/codex-out.md
+wait "$CODEX_PID"
+cat $OUT/out.md
 ```
 
 Read the file only after the process exits. A partial file is a partial answer. There is no timeout flag; if a bounded wait is needed, use the shell's job control (`wait`, or `kill` after a deadline) rather than reading early.
@@ -159,8 +166,9 @@ Read the file only after the process exits. A partial file is a partial answer. 
 ### Built-in review
 
 ```bash
-codex review --base main -c sandbox_mode=read-only </dev/null 2>/tmp/codex-log.txt
-codex review --uncommitted -c model=gpt-5.4-mini -c model_reasoning_effort=low -c sandbox_mode=read-only </dev/null 2>/tmp/codex-log.txt
+OUT=$(mktemp -d)
+codex review --base main -c sandbox_mode=read-only </dev/null 2>$OUT/log.txt
+codex review --uncommitted -c model=gpt-5.4-mini -c model_reasoning_effort=low -c sandbox_mode=read-only </dev/null 2>$OUT/log.txt
 ```
 
 ## Prompt-quality checklist for delegation

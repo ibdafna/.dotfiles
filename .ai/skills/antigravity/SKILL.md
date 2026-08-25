@@ -145,7 +145,7 @@ Long jobs run in the background and are read whole when done:
 agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high --print-timeout 30m -p "<prompt>" > /tmp/agy-out.txt 2>&1 &
 AGY_PID=$!
 # ... continue other work ...
-wait agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high_PID; cat /tmp/agy-out.txt
+wait "$AGY_PID"; cat /tmp/agy-out.txt
 ```
 
 Mechanical bulk work (renames, fixture generation, many small edits) is the case for `--model gemini-3.7-flash-high`.

@@ -43,17 +43,19 @@ Model ids present in CLI 0.147.0 include `gpt-5.6`, `gpt-5.6-pro`, `gpt-5.5`, `g
 ## Core Invocation Pattern
 
 ```bash
+OUT=$(mktemp -d)
 codex exec --skip-git-repo-check --color never \
   -c approval_policy=never -s read-only \
-  -o /tmp/codex-out.md "<prompt>" </dev/null 2>/tmp/codex-log.txt
-cat /tmp/codex-out.md
+  -o $OUT/out.md "<prompt>" </dev/null 2>$OUT/log.txt
+cat $OUT/out.md
 ```
 
 Long prompts (a diff, a plan) go on stdin with `-` as the prompt argument instead of `</dev/null`:
 
 ```bash
+OUT=$(mktemp -d)
 codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only \
-  -o /tmp/codex-out.md - < /tmp/prompt.md 2>/tmp/codex-log.txt
+  -o $OUT/out.md - < $OUT/prompt.md 2>$OUT/log.txt
 ```
 
 Key flags (verified against `codex exec --help`, CLI 0.147.0):
@@ -72,7 +74,7 @@ Key flags (verified against `codex exec --help`, CLI 0.147.0):
 | `--json` | Print events to stdout as JSONL |
 | `--ephemeral` | Do not persist the session (disables later `resume`) |
 | `--color never` | Plain output |
-| `-p, --profile <name>` | Layer `codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only_HOME/<name>.config.toml` on top of the base config |
+| `-p, --profile <name>` | Layer `$CODEX_HOME/<name>.config.toml` on top of the base config |
 | `--dangerously-bypass-approvals-and-sandbox` | No sandbox at all. Only inside an environment that is already sandboxed. |
 
 Subcommands: `exec`, `exec resume`, `review`, `doctor`, `features`, `help` (safe); `resume`, `fork`, `cloud`, `app`, `login`, `update`, and bare `codex` (interactive; not from a script).
@@ -104,48 +106,52 @@ Every example uses the read-only sandbox; delegation swaps in `-s workspace-writ
 Frame the prompt as an attack: Codex's job is to find flaws.
 
 ```bash
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o /tmp/codex-out.md \
+OUT=$(mktemp -d)
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md \
   "You are an adversarial reviewer. Your job is to break the following plan / diff. \
    Find edge cases, race conditions, security holes, broken assumptions, and missing tests. \
    Be ruthless. Output a numbered list of concrete problems, severity (HIGH/MED/LOW), \
    and the smallest reproducible scenario for each.
 
-   <plan or diff here>" </dev/null 2>/tmp/codex-log.txt
-cat /tmp/codex-out.md
+   <plan or diff here>" </dev/null 2>$OUT/log.txt
+cat $OUT/out.md
 ```
 
 ### Plan / second-opinion review
 
 ```bash
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o /tmp/codex-out.md \
+OUT=$(mktemp -d)
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md \
   "Review the plan below as a senior engineer. \
    Output: (1) what's strong, (2) what's risky, (3) concrete suggested changes, \
    (4) verdict: SHIP / REVISE / RETHINK.
 
-   <plan>" </dev/null 2>/tmp/codex-log.txt
-cat /tmp/codex-out.md
+   <plan>" </dev/null 2>$OUT/log.txt
+cat $OUT/out.md
 ```
 
 ### Subagent delegation (self-contained task)
 
 ```bash
+OUT=$(mktemp -d)
 codex exec --skip-git-repo-check --color never -c approval_policy=never -s workspace-write \
-  -C /path/to/repo -o /tmp/codex-out.md \
+  -C /path/to/repo -o $OUT/out.md \
   "Task: <one-line goal>.
    Inputs: <files/paths/data>.
    Constraints: <style, deps, must-not-touch>.
    Deliverable: <exact output format: files edited in place, patch on stdout, JSON, etc.>.
-   Apply edits directly. Do not ask for confirmation." </dev/null 2>/tmp/codex-log.txt
-cat /tmp/codex-out.md
+   Apply edits directly. Do not ask for confirmation." </dev/null 2>$OUT/log.txt
+cat $OUT/out.md
 ```
 
 Long jobs run in the background and are read whole when done:
 
 ```bash
-codex exec ... -o /tmp/codex-out.md "<prompt>" </dev/null 2>/tmp/codex-log.txt &
+OUT=$(mktemp -d)
+codex exec ... -o $OUT/out.md "<prompt>" </dev/null 2>$OUT/log.txt &
 CODEX_PID=$!
 # ... continue other work ...
-wait codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only_PID; cat /tmp/codex-out.md
+wait "$CODEX_PID"; cat $OUT/out.md
 ```
 
 Mechanical bulk work (renames, fixture generation, many small edits) is the case for `-m gpt-5.4-mini -c model_reasoning_effort=low`.
@@ -155,29 +161,32 @@ Mechanical bulk work (renames, fixture generation, many small edits) is the case
 Built-in review of a scope, with Codex's own review prompt (findings come back prioritized `[P1]`, `[P2]`, ... with `file:line` references on stdout):
 
 ```bash
-codex review --base main -c sandbox_mode=read-only </dev/null 2>/tmp/codex-log.txt
-codex review --uncommitted -c sandbox_mode=read-only </dev/null 2>/tmp/codex-log.txt
-codex review --commit <sha> -c sandbox_mode=read-only </dev/null 2>/tmp/codex-log.txt
+OUT=$(mktemp -d)
+codex review --base main -c sandbox_mode=read-only </dev/null 2>$OUT/log.txt
+codex review --uncommitted -c sandbox_mode=read-only </dev/null 2>$OUT/log.txt
+codex review --commit <sha> -c sandbox_mode=read-only </dev/null 2>$OUT/log.txt
 ```
 
 Review with your own instructions (no scope flag allowed alongside a prompt, so feed the diff yourself):
 
 ```bash
+OUT=$(mktemp -d)
 { printf '%s\n\n' "Review this diff for: (1) correctness bugs, (2) security issues, \
 (3) style / consistency, (4) missing tests. For each finding: file:line, severity, why, suggested fix."
-  git diff main...HEAD; } > /tmp/prompt.md
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o /tmp/codex-out.md - < /tmp/prompt.md 2>/tmp/codex-log.txt
-cat /tmp/codex-out.md
+  git diff main...HEAD; } > $OUT/prompt.md
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md - < $OUT/prompt.md 2>$OUT/log.txt
+cat $OUT/out.md
 ```
 
-For findings you will parse, add `--output-schema /tmp/findings.schema.json`.
+For findings you will parse, add `--output-schema $OUT/findings.schema.json`.
 
 ### General consult / Q&A with follow-up
 
 ```bash
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o /tmp/codex-out.md "<question>" </dev/null 2>/tmp/codex-log.txt
-SID=$(grep -o 'session id: .*' /tmp/codex-log.txt | awk '{print $3}')
-codex exec resume --skip-git-repo-check "$SID" "<follow-up>" </dev/null 2>/tmp/codex-log2.txt
+OUT=$(mktemp -d)
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<question>" </dev/null 2>$OUT/log.txt
+SID=$(grep -o 'session id: .*' $OUT/log.txt | awk '{print $3}')
+codex exec resume --skip-git-repo-check "$SID" "<follow-up>" </dev/null 2>$OUT/log2.txt
 ```
 
 Do not add `--ephemeral` to a run you may want to resume.
@@ -185,11 +194,12 @@ Do not add `--ephemeral` to a run you may want to resume.
 ### Codebase research
 
 ```bash
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -C /path/to/repo -o /tmp/codex-out.md \
+OUT=$(mktemp -d)
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -C /path/to/repo -o $OUT/out.md \
   "Investigate the codebase at the working root. \
    Answer: <specific question>. \
-   Cite file paths and line numbers in the answer." </dev/null 2>/tmp/codex-log.txt
-cat /tmp/codex-out.md
+   Cite file paths and line numbers in the answer." </dev/null 2>$OUT/log.txt
+cat $OUT/out.md
 ```
 
 ## Standard Integration Workflow
@@ -197,13 +207,14 @@ cat /tmp/codex-out.md
 The Generate → Review → Fix loop:
 
 ```bash
+OUT=$(mktemp -d)
 # 1. Generate (you write the code)
 # 2. Independent review by Codex
-codex review --uncommitted -c sandbox_mode=read-only </dev/null 2>/tmp/codex-log.txt
+codex review --uncommitted -c sandbox_mode=read-only </dev/null 2>$OUT/log.txt
 # 3. Apply the fixes yourself, or delegate them back:
 codex exec --skip-git-repo-check --color never -c approval_policy=never -s workspace-write \
-  -o /tmp/codex-out.md "Fix these issues in <file>: <list>. Apply edits directly. Do not ask for confirmation." \
-  </dev/null 2>/tmp/codex-log.txt
+  -o $OUT/out.md "Fix these issues in <file>: <list>. Apply edits directly. Do not ask for confirmation." \
+  </dev/null 2>$OUT/log.txt
 ```
 
 Always validate Codex output before trusting it: read the changed files, run tests / type-check / lint, and verify the change matches the original intent.
