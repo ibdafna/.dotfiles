@@ -1,20 +1,8 @@
 {
-  "attribution": {
-    "commit": "",
-    "pr": ""
+  "skipDangerousModePermissionPrompt": true,
+  "permissions": {
+    "defaultMode": "bypassPermissions"
   },
   "includeCoAuthoredBy": false,
-  "permissions": {
-    "defaultMode": "dontAsk"
-  },
-  "model": "claude-fable-5[1m]",
-  "statusLine": {
-    "type": "command",
-    "command": "bash /Users/idafna/.claude/statusline-command.sh"
-  },
-  "outputStyle": "insights",
-  "effortLevel": "high",
-  "tui": "fullscreen",
-  "skipDangerousModePermissionPrompt": true,
-  "agentPushNotifEnabled": true
+  "outputStyle": "insights"
 }
