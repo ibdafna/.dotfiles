@@ -99,7 +99,11 @@ cat $OUT/out.md
 
 ```bash
 OUT=$(mktemp -d)
+cat > $OUT/prompt.md <<'PROMPT'
+<prompt, as long as needed>
+PROMPT
 codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md - < $OUT/prompt.md >/dev/null 2>$OUT/log.txt
+cat $OUT/out.md
 ```
 
 ### Edits applied in a repository
@@ -129,6 +133,9 @@ cat > $OUT/findings.schema.json <<'JSON'
  "required":["file","line","severity","note"],"additionalProperties":false}}},
  "required":["findings"],"additionalProperties":false}
 JSON
+cat > $OUT/prompt.md <<'PROMPT'
+<task>. Return the findings in the schema; no prose.
+PROMPT
 codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only --output-schema $OUT/findings.schema.json -o $OUT/out.json - < $OUT/prompt.md >/dev/null 2>$OUT/log.txt
 jq . $OUT/out.json
 ```
@@ -154,14 +161,18 @@ codex exec resume --skip-git-repo-check -c approval_policy=never -c sandbox_mode
 ### Background long-running job
 
 ```bash
-OUT=$(mktemp -d)
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<prompt>" </dev/null >/dev/null 2>$OUT/log.txt &
-CODEX_PID=$!
-wait "$CODEX_PID"
-cat $OUT/out.md
+OUT=$(mktemp -d); echo "$OUT"   # note the printed path; later calls re-type it
+( codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<prompt>" </dev/null >/dev/null 2>$OUT/log.txt; echo $? > $OUT/exit ) &
 ```
 
-Read the file only after the process exits. A partial file is a partial answer. There is no timeout flag; if a bounded wait is needed, use the shell's job control (`wait`, or `kill` after a deadline) rather than reading early.
+Check from a later call:
+
+```bash
+OUT=/path/printed/above
+[ -f $OUT/exit ] && cat $OUT/out.md || echo "still running"
+```
+
+Shell state (`$OUT`, `$!`) does not persist between an agent's tool calls and `wait` only accepts the current shell's children, so the marker file is what tells a later call the job is done. If the harness has its own background-command facility (Claude Code's `run_in_background`, for example), prefer it over `&`. Read the file only after the marker exists. A partial file is a partial answer. There is no timeout flag; if a bounded wait is needed, `kill` the job after a deadline rather than reading early.
 
 ### Built-in review
 

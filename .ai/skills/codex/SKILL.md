@@ -54,8 +54,12 @@ Long prompts (a diff, a plan) go on stdin with `-` as the prompt argument instea
 
 ```bash
 OUT=$(mktemp -d)
+cat > $OUT/prompt.md <<'PROMPT'
+<prompt, as long as needed>
+PROMPT
 codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only \
   -o $OUT/out.md - < $OUT/prompt.md >/dev/null 2>$OUT/log.txt
+cat $OUT/out.md
 ```
 
 Key flags (verified against `codex exec --help`, CLI 0.147.0):
@@ -144,15 +148,21 @@ codex exec --skip-git-repo-check --color never -c approval_policy=never -s works
 cat $OUT/out.md
 ```
 
-Long jobs run in the background and are read whole when done:
+Long jobs run in the background with a completion marker, so a later tool call can check on them (shell state, `$OUT`, and `$!` do not survive between calls, and `wait` only works on the shell's own children):
 
 ```bash
-OUT=$(mktemp -d)
-codex exec ... -o $OUT/out.md "<prompt>" </dev/null >/dev/null 2>$OUT/log.txt &
-CODEX_PID=$!
-# ... continue other work ...
-wait "$CODEX_PID"; cat $OUT/out.md
+OUT=$(mktemp -d); echo "$OUT"   # note the printed path; later calls re-type it
+( codex exec ... -o $OUT/out.md "<prompt>" </dev/null >/dev/null 2>$OUT/log.txt; echo $? > $OUT/exit ) &
 ```
+
+Later, in another call:
+
+```bash
+OUT=/path/printed/above
+[ -f $OUT/exit ] && cat $OUT/out.md || echo "still running"
+```
+
+If the harness offers its own background-command facility (for example Claude Code's `run_in_background`), prefer it over `&`: some harnesses stop stray processes when a call returns. Within one persistent shell, `wait` on the job works as usual.
 
 Mechanical bulk work (renames, fixture generation, many small edits) is the case for `-m gpt-5.4-mini -c model_reasoning_effort=low`.
 
