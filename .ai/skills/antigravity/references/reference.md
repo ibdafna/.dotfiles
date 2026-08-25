@@ -8,7 +8,7 @@ Complete flag and subcommand reference for the Antigravity CLI, verified against
 |---|---|
 | `-p`, `--print`, `--prompt` | Run a single prompt non-interactively and print the response. |
 | `--model <id>` | Model for the session. `agy models` lists the ids. |
-| `--effort low\|medium\|high` | Reasoning effort for the session. |
+| `--effort low\|medium\|high` | Reasoning effort. Must match the suffix in the model id; a mismatch is rejected. Usually omitted. |
 | `--output-format text\|json\|stream-json` | Output format in print mode. Default `text`. |
 | `--input-format text\|stream-json` | Input format in print mode. `stream-json` reads one NDJSON message per line from stdin and runs a turn for each; requires `--output-format stream-json`. |
 | `--json-schema <schema or path>` | Enforce structured output (for `stream-json`, applies to the final result only). |
@@ -31,7 +31,7 @@ Complete flag and subcommand reference for the Antigravity CLI, verified against
 | Subcommand | Description |
 |---|---|
 | `agy models` | List available models with ids and display names. |
-| `agy agents` (alias `agent`) | List available agents. |
+| `agy agents` (alias `agent`) | List available agents. Renders an interactive view and blocks; do not call from a script. |
 | `agy mcp <add\|remove\|list\|enable\|disable>` | Manage MCP servers. |
 | `agy plugin <cmd>` (alias `plugins`) | Manage plugins. |
 | `agy changelog` | Show changelog and release notes. |
@@ -61,7 +61,7 @@ Complete flag and subcommand reference for the Antigravity CLI, verified against
 The prefix used throughout:
 
 ```bash
-AGY="agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high --effort high"
+AGY="agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high"
 ```
 
 ### Non-interactive prompt

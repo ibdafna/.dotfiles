@@ -25,12 +25,12 @@ Antigravity replaced the Gemini CLI integration. Default to `agy` whenever an "o
 - **Capture full stdout, then read it whole.** End every call with `2>&1`. For anything longer than a quick question, redirect to a file, wait for the process to exit, then read the entire file. Do not `tail` a running job and act on a partial answer.
 - **Set `--print-timeout`** above the job's expected length (default `5m`). A timeout produces an incomplete answer, not an error you can retry.
 - **Ask for machine-readable output when you will parse it:** `--output-format json`, or `--json-schema <file-or-string>` to enforce a shape.
-- **Avoid subcommands that may prompt** (`agy install`, `agy update`, `agy plugin install`). Tell the user to run those.
+- **Avoid subcommands that prompt or render a view** (`agy install`, `agy update`, `agy plugin install`, and `agy agents`, which blocks). `agy models` is safe. Tell the user to run the others.
 - **Write prompts that leave no room for a clarifying question.** `--dangerously-skip-permissions` skips tool approvals, not `agy`'s own questions. Give the goal, inputs, constraints, and exact deliverable; say "do not ask for confirmation".
 
 ## Model selection
 
-`agy models` lists what your account can run. Pick with `--model`, and set `--effort high` unless speed matters more than depth.
+`agy models` lists what your account can run. Pick with `--model`. The effort level is part of the model id (`-high`, `-medium`, `-low`), so omit `--effort`, or pass the value that matches the suffix; a mismatch (`--model gemini-3.7-flash-high --effort low`) is rejected as an invalid model selection.
 
 | Need | Model |
 |---|---|
@@ -44,7 +44,7 @@ If a model id is rejected, run `agy models` and pick the closest current entry; 
 
 ```bash
 agy --dangerously-skip-permissions --disable-slash-commands \
-  --model gemini-3.1-pro-high --effort high \
+  --model gemini-3.1-pro-high \
   -p "<prompt>" 2>&1
 ```
 
@@ -65,7 +65,7 @@ Key flags (verified against `agy --help`, CLI 1.1.20):
 |---|---|
 | `-p`, `--print`, `--prompt` | Run a single prompt non-interactively and print the response |
 | `--model <id>` | Model for this session (see Model selection) |
-| `--effort low\|medium\|high` | Reasoning effort |
+| `--effort low\|medium\|high` | Reasoning effort; must match the model id's suffix, so usually omitted |
 | `--output-format text\|json\|stream-json` | Output format in print mode (default `text`) |
 | `--json-schema <schema or path>` | Enforce structured output |
 | `--dangerously-skip-permissions` | Auto-approve tool permission requests |
@@ -78,7 +78,7 @@ Key flags (verified against `agy --help`, CLI 1.1.20):
 | `--agent <name>`, `--project <id>` | Pick a configured agent or project |
 | `-i`, `--prompt-interactive` | Interactive session. Never use from an agent. |
 
-Subcommands: `models`, `agents`, `mcp`, `plugin`, `changelog`, `update`, `install`, `help`.
+Subcommands: `models`, `mcp`, `plugin`, `changelog`, `help` (safe), and `agents`, `update`, `install` (interactive; not from a script).
 
 ## Verifying Installation
 
@@ -102,7 +102,7 @@ If missing, surface that to the user; do not silently fall back to another tool.
 Every example below uses the default model; swap `--model` per the table above. `AGY` stands for the core invocation prefix:
 
 ```bash
-AGY="agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high --effort high"
+AGY="agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high"
 ```
 
 ### Adversarial review (challenge)

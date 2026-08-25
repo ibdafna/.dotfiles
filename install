@@ -242,6 +242,10 @@ link_optional_children ".ai/skills" "$HOME/.claude/skills"
 link_optional_children ".ai/skills" "$HOME/.codex/skills"
 link_optional_children ".ai/skills" "$HOME/.agents/skills"
 link_optional_children ".ai/skills" "$HOME/.cursor/skills"
+link_optional_children ".ai/skills" "$HOME/.gemini/config/skills"
+
+# Antigravity (agy) defines agents as <name>/agent.md with its own frontmatter.
+link_optional_children ".ai/antigravity/agents" "$HOME/.gemini/config/agents"
 
 install_shell_manifest() {
   local manifest="$1"

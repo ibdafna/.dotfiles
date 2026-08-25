@@ -47,7 +47,8 @@ The repo can also manage portable AI CLI config under `.ai/`:
 - `.ai/claude/settings.json` -> `~/.claude/settings.json`
 - `.ai/claude/CLAUDE.md` -> `~/.claude/CLAUDE.md`
 - `.ai/agents/*` -> `~/.claude/agents/*`, `~/.codex/agents/*`, `~/.cursor/agents/*`
-- `.ai/skills/*` -> `~/.claude/skills/*`, `~/.codex/skills/*`, `~/.agents/skills/*`, `~/.cursor/skills/*` (one folder of plain SKILL.md directories shared by every agent)
+- `.ai/skills/*` -> `~/.claude/skills/*`, `~/.codex/skills/*`, `~/.agents/skills/*`, `~/.cursor/skills/*`, `~/.gemini/config/skills/*` (one folder of plain SKILL.md directories shared by every agent, Antigravity included)
+- `.ai/antigravity/agents/*` -> `~/.gemini/config/agents/*` (pstack's agents in Antigravity's `agent.md` format)
 - `.ai/gemini/settings.json` -> `~/.gemini/settings.json`
 - `.ai/gemini/GEMINI.md` -> `~/.gemini/GEMINI.md`
 - `.ai/gemini/commands/*` -> `~/.gemini/commands/*`
