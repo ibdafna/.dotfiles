@@ -7,7 +7,7 @@ pstack runs on Cursor (IDE and CLI), Claude Code, and Codex CLI. The skills desc
 | Capability | Cursor | Claude Code | Codex CLI | Fallback when absent |
 |---|---|---|---|---|
 | Spawn a subagent | `Task` tool | `Agent` tool | `spawn_agent` tool | Do the work inline, in sequence, and say so in the reply. |
-| Named pstack agent | `subagent_type: "<name>"` | `subagent_type: "<name>"` (`"pstack:<name>"` when installed as a plugin) | An `[agents.<name>]` role in `~/.codex/config.toml` (written by `/setup-pstack`); otherwise inline the agent file's body into the spawn prompt | Paste the agent file body into the prompt. |
+| Named pstack agent | `subagent_type: "<name>"` | `subagent_type: "<name>"` (`"pstack:<name>"` when installed as a plugin) | An `[agents.<name>]` role in `~/.codex/config.toml` (written by `/setup-pstack`); otherwise inline the body of `~/.codex/agents/<name>.md` into the spawn prompt | Paste the agent file body into the prompt. |
 | Generic worker | `subagent_type: generalPurpose` | `subagent_type: general-purpose` | `spawn_agent` with no role | Same. |
 | Background spawn | `run_in_background: true` | `run_in_background: true` | Spawns are asynchronous by default; collect with `wait_agent` | Spawn one at a time. |
 | Per-spawn model | `model: <slug>` | `model: <alias>` (`sonnet`, `opus`, `haiku`, `fable`) | Not per spawn. `default_subagent_model` in config.toml, or a role's config file | Omit the model and vary the prompt lens instead (see `models.md`). |
@@ -30,6 +30,7 @@ pstack runs on Cursor (IDE and CLI), Claude Code, and Codex CLI. The skills desc
 | Installed plugins | `~/.cursor/plugins/` | `~/.claude/plugins/` | `~/.codex/plugins/` |
 | Session transcripts | `~/.cursor/projects/<slug>/agent-transcripts/` (`<slug>` is the workspace path with the leading slash dropped and each `/` turned into `-`; layouts: `<id>.jsonl`, `<id>/<id>.jsonl`, `<parent>/subagents/<child>.jsonl`) | `~/.claude/projects/<slug>/*.jsonl` (`<slug>` is the workspace path with each `/` turned into `-`, leading dash kept) | `~/.codex/sessions/<YYYY>/<MM>/<DD>/*.jsonl` (all workspaces; filter by the `cwd` field) |
 | pstack model config | `~/.agents/pstack/models.md` (see `models.md`) | same | same |
+| pstack agent definitions (`rigorous-agent.md`, `comment-sicko.md`) | `~/.cursor/agents/` | `~/.claude/agents/` | `~/.codex/agents/` |
 
 Transcript rules hold on every harness. Read only the active workspace's transcripts. Never glob across other projects' directories; that reads private chats from unrelated work. Order candidates by modification time (`ls -t`), never by id.
 

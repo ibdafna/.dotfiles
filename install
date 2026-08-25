@@ -223,7 +223,11 @@ link_path "$DOTFILES_DIR/bin/tmux-sessionizer" "$HOME/bin/tmux-sessionizer"
 
 link_optional_path ".ai/claude/settings.json" "$HOME/.claude/settings.json"
 link_optional_path ".ai/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
-link_optional_children ".ai/claude/agents" "$HOME/.claude/agents"
+# Agent definitions (pstack's rigorous-agent and comment-sicko), one folder for
+# every harness that reads a personal agents directory.
+link_optional_children ".ai/agents" "$HOME/.claude/agents"
+link_optional_children ".ai/agents" "$HOME/.codex/agents"
+link_optional_children ".ai/agents" "$HOME/.cursor/agents"
 
 link_optional_path ".ai/gemini/settings.json" "$HOME/.gemini/settings.json"
 link_optional_path ".ai/gemini/GEMINI.md" "$HOME/.gemini/GEMINI.md"
