@@ -58,43 +58,39 @@ Complete flag and subcommand reference for the Antigravity CLI, verified against
 
 ## Common invocation patterns
 
-The prefix used throughout:
-
-```bash
-AGY="agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high"
-```
+Every example uses the full command (no `$PREFIX` variable: zsh does not word-split it, and shell state does not persist between an agent's tool calls).
 
 ### Non-interactive prompt
 
 ```bash
-$AGY -p "<prompt>" 2>&1
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high -p "<prompt>" 2>&1
 ```
 
 ### Extended timeout
 
 ```bash
-$AGY --print-timeout 20m -p "<prompt>" 2>&1
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high --print-timeout 20m -p "<prompt>" 2>&1
 ```
 
 ### Multi-root workspace
 
 ```bash
-$AGY --add-dir /path/to/repo-a --add-dir /path/to/repo-b -p "<prompt>" 2>&1
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high --add-dir /path/to/repo-a --add-dir /path/to/repo-b -p "<prompt>" 2>&1
 ```
 
 ### Continue a conversation
 
 ```bash
-$AGY -c -p "<follow-up>" 2>&1
-$AGY --conversation <conversation-id> -p "<follow-up>" 2>&1
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high -c -p "<follow-up>" 2>&1
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high --conversation <conversation-id> -p "<follow-up>" 2>&1
 ```
 
 ### Background long-running job
 
 ```bash
-$AGY --print-timeout 30m -p "<prompt>" > /tmp/agy-out.txt 2>&1 &
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high --print-timeout 30m -p "<prompt>" > /tmp/agy-out.txt 2>&1 &
 AGY_PID=$!
-wait $AGY_PID
+wait "$AGY_PID"
 cat /tmp/agy-out.txt
 ```
 
@@ -103,7 +99,7 @@ Read the file only after the process exits. A partial file is a partial answer.
 ### Sandbox mode
 
 ```bash
-$AGY --sandbox -p "<prompt>" 2>&1
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high --sandbox -p "<prompt>" 2>&1
 ```
 
 Use for untrusted tasks or prompts that might trigger shell commands you don't want loose on the host.
@@ -113,7 +109,7 @@ Use for untrusted tasks or prompts that might trigger shell commands you don't w
 `text` (default) prints the response as plain text. `json` wraps the result in a JSON envelope for parsing. `--json-schema` constrains the model's answer to a shape:
 
 ```bash
-$AGY --output-format json --json-schema /tmp/findings.schema.json -p \
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high --output-format json --json-schema /tmp/findings.schema.json -p \
   "<task>. Return findings as JSON: file, line, severity (HIGH|MED|LOW), note." 2>&1
 ```
 

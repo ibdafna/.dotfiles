@@ -99,18 +99,14 @@ If missing, surface that to the user; do not silently fall back to another tool.
 
 ## Mode Playbooks
 
-Every example below uses the default model; swap `--model` per the table above. `AGY` stands for the core invocation prefix:
-
-```bash
-AGY="agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high"
-```
+Every example below uses the default model; swap `--model` per the table above. Commands are written out in full because shell variables do not word-split in zsh and shell state does not persist between an agent's tool calls.
 
 ### Adversarial review (challenge)
 
 Frame the prompt as an attack: `agy`'s job is to find flaws.
 
 ```bash
-$AGY -p \
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high -p \
   "You are an adversarial reviewer. Your job is to break the following plan / diff. \
    Find edge cases, race conditions, security holes, broken assumptions, and missing tests. \
    Be ruthless. Output a numbered list of concrete problems, severity (HIGH/MED/LOW), \
@@ -122,7 +118,7 @@ $AGY -p \
 ### Plan / second-opinion review
 
 ```bash
-$AGY -p \
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high -p \
   "Review the plan below as a senior engineer. \
    Output: (1) what's strong, (2) what's risky, (3) concrete suggested changes, \
    (4) verdict: SHIP / REVISE / RETHINK.
@@ -135,7 +131,7 @@ For a second opinion from a different model family than your own, use `--model c
 ### Subagent delegation (self-contained task)
 
 ```bash
-$AGY --print-timeout 15m -p \
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high --print-timeout 15m -p \
   "Task: <one-line goal>.
    Inputs: <files/paths/data>.
    Constraints: <style, deps, must-not-touch>.
@@ -146,10 +142,10 @@ $AGY --print-timeout 15m -p \
 Long jobs run in the background and are read whole when done:
 
 ```bash
-$AGY --print-timeout 30m -p "<prompt>" > /tmp/agy-out.txt 2>&1 &
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high --print-timeout 30m -p "<prompt>" > /tmp/agy-out.txt 2>&1 &
 AGY_PID=$!
 # ... continue other work ...
-wait $AGY_PID; cat /tmp/agy-out.txt
+wait "$AGY_PID"; cat /tmp/agy-out.txt
 ```
 
 Mechanical bulk work (renames, fixture generation, many small edits) is the case for `--model gemini-3.7-flash-high`.
@@ -158,7 +154,7 @@ Mechanical bulk work (renames, fixture generation, many small edits) is the case
 
 ```bash
 git diff <base>...HEAD > /tmp/diff.patch
-$AGY -p \
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high -p \
   "Review this diff for: (1) correctness bugs, (2) security issues, \
    (3) style / consistency, (4) missing tests. \
    For each finding: file:line, severity, why, suggested fix.
@@ -171,14 +167,14 @@ For findings you will parse, add `--output-format json` and describe the JSON sh
 ### General consult / Q&A with follow-up
 
 ```bash
-$AGY -p "<question>" 2>&1
-$AGY -c -p "<follow-up>" 2>&1
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high -p "<question>" 2>&1
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high -c -p "<follow-up>" 2>&1
 ```
 
 ### Codebase research
 
 ```bash
-$AGY --add-dir /path/to/repo --print-timeout 15m -p \
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high --add-dir /path/to/repo --print-timeout 15m -p \
   "Investigate the codebase at the workspace root. \
    Answer: <specific question>. \
    Cite file paths and line numbers in the answer." 2>&1
@@ -191,9 +187,9 @@ The Generate → Review → Fix loop:
 ```bash
 # 1. Generate (you write the code)
 # 2. Independent review by agy
-$AGY -p "Review <file> for bugs, security issues, and style. Be thorough." 2>&1
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high -p "Review <file> for bugs, security issues, and style. Be thorough." 2>&1
 # 3. Apply the fixes yourself, or delegate them back:
-$AGY -p "Fix these issues in <file>: <list>. Apply edits directly. Do not ask for confirmation." 2>&1
+agy --dangerously-skip-permissions --disable-slash-commands --model gemini-3.1-pro-high -p "Fix these issues in <file>: <list>. Apply edits directly. Do not ask for confirmation." 2>&1
 ```
 
 Always validate `agy` output before trusting it: read the changed files, run tests / type-check / lint, and verify the change matches the original intent.
