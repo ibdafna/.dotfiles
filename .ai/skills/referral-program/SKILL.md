@@ -234,15 +234,15 @@ They get [their reward] too.
 
 ## Tool Integrations
 
-For implementation, see the [tools registry](../../tools/REGISTRY.md). Key tools for referral programs:
+For implementation, follow each platform's official documentation. Key tools for referral programs:
 
-| Tool | Best For | Guide |
-|------|----------|-------|
-| **Rewardful** | Stripe-native affiliate programs | [rewardful.md](../../tools/integrations/rewardful.md) |
-| **Tolt** | SaaS affiliate programs | [tolt.md](../../tools/integrations/tolt.md) |
-| **Mention Me** | Enterprise referral programs | [mention-me.md](../../tools/integrations/mention-me.md) |
-| **Dub.co** | Link tracking and attribution | [dub-co.md](../../tools/integrations/dub-co.md) |
-| **Stripe** | Payment processing (for commission tracking) | [stripe.md](../../tools/integrations/stripe.md) |
+| Tool | Best For |
+|------|----------|
+| **Rewardful** | Stripe-native affiliate programs |
+| **Tolt** | SaaS affiliate programs |
+| **Mention Me** | Enterprise referral programs |
+| **Dub.co** | Link tracking and attribution |
+| **Stripe** | Payment processing (for commission tracking) |
 
 ---
 

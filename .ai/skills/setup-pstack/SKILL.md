@@ -37,11 +37,11 @@ Codex addresses subagents by role, not by plugin agent file. A role is an `[agen
 
 ```toml
 developer_instructions = """
-<body of <pstack install path>/agents/rigorous-agent.md, below its frontmatter>
+<body of ~/.codex/agents/rigorous-agent.md, below its frontmatter>
 """
 ```
 
-`~/.codex/agents/comment-sicko.toml`: the same shape with the body of `agents/comment-sicko.md`, plus `sandbox_mode = "read-only"` since that agent never writes.
+`~/.codex/agents/comment-sicko.toml`: the same shape with the body of `~/.codex/agents/comment-sicko.md`, plus `sandbox_mode = "read-only"` since that agent never writes.
 
 `~/.codex/config.toml`:
 
@@ -57,7 +57,7 @@ config_file = "~/.codex/agents/comment-sicko.toml"
 
 Confirm the role appears when you spawn a subagent. If your Codex version rejects the overlay keys, fall back to the harness reference's rule: paste the agent file's body into the spawn prompt instead.
 
-On Cursor and Claude Code the plugin's `agents/` directory registers these automatically; skip this step.
+On Cursor and Claude Code the agent files in `~/.cursor/agents/` and `~/.claude/agents/` (or the plugin's `agents/` directory) register automatically; skip this step.
 
 ### 7. Confirm
 
