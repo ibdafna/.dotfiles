@@ -22,7 +22,7 @@ Codex is the GPT-family counterpart of the `antigravity` skill (Gemini family). 
 - **Only two entry points: `codex exec` and `codex review`.** Never run bare `codex`, `codex resume`, `codex fork` (both open a session picker), `codex cloud`, `codex app`, `codex login`, or `codex update`. Follow-ups go through `codex exec resume <session-id> "<prompt>"`, which is non-interactive; re-pass `-c approval_policy=never -c sandbox_mode=read-only` on it, because a resume takes its policy from the base config, not from the original run.
 - **Always `</dev/null`** (or feed the prompt on stdin, see below). When stdin is not a terminal, `codex exec` reads it and appends it to the prompt; an open pipe stalls the run.
 - **Never rely on approvals.** Pass `-c approval_policy=never` and an explicit sandbox: `-s read-only` for review, consult, and research; `-s workspace-write` when you want edits applied. There is nobody to answer an approval prompt.
-- **Capture the whole answer, then read it whole.** stdout carries only the agent's final message; the header, transcript, and token count go to stderr. Use `-o <file>` to write the final message to a file as well, redirect stderr to a log, wait for the process to exit, then read the file. Do not `tail` a running job and act on a partial answer.
+- **Capture the whole answer, then read it whole.** stdout carries only the agent's final message; the header, transcript, and token count go to stderr. Use `-o <file>` to write the final message to a file, send stdout to `/dev/null` (otherwise the message prints twice), redirect stderr to a log, wait for the process to exit, then read the file. Do not `tail` a running job and act on a partial answer.
 - **Ask for machine-readable output when you will parse it:** `--output-schema <json-schema-file>` constrains the final message to a shape; `--json` prints events as JSONL.
 - **Outside a git repository add `--skip-git-repo-check`**, or the run refuses to start. Same for `codex exec resume`.
 - **No built-in timeout flag.** For long jobs, run in the background, `wait`, then read the file.
@@ -46,7 +46,7 @@ Model ids present in CLI 0.147.0 include `gpt-5.6`, `gpt-5.6-pro`, `gpt-5.5`, `g
 OUT=$(mktemp -d)
 codex exec --skip-git-repo-check --color never \
   -c approval_policy=never -s read-only \
-  -o $OUT/out.md "<prompt>" </dev/null 2>$OUT/log.txt
+  -o $OUT/out.md "<prompt>" </dev/null >/dev/null 2>$OUT/log.txt
 cat $OUT/out.md
 ```
 
@@ -55,7 +55,7 @@ Long prompts (a diff, a plan) go on stdin with `-` as the prompt argument instea
 ```bash
 OUT=$(mktemp -d)
 codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only \
-  -o $OUT/out.md - < $OUT/prompt.md 2>$OUT/log.txt
+  -o $OUT/out.md - < $OUT/prompt.md >/dev/null 2>$OUT/log.txt
 ```
 
 Key flags (verified against `codex exec --help`, CLI 0.147.0):
@@ -77,7 +77,7 @@ Key flags (verified against `codex exec --help`, CLI 0.147.0):
 | `-p, --profile <name>` | Layer `$CODEX_HOME/<name>.config.toml` on top of the base config |
 | `--dangerously-bypass-approvals-and-sandbox` | No sandbox at all. Only inside an environment that is already sandboxed. |
 
-Subcommands: `exec`, `exec resume`, `review`, `doctor`, `features`, `help` (safe); `resume`, `fork`, `cloud`, `app`, `login`, `update`, and bare `codex` (interactive; not from a script).
+Subcommands: `exec`, `exec resume`, `review`, `doctor`, `features list`, `help` (safe); `resume`, `fork`, `cloud`, `app`, `login`, `update`, and bare `codex` (interactive; not from a script).
 
 ## Verifying Installation
 
@@ -113,7 +113,7 @@ codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-
    Be ruthless. Output a numbered list of concrete problems, severity (HIGH/MED/LOW), \
    and the smallest reproducible scenario for each.
 
-   <plan or diff here>" </dev/null 2>$OUT/log.txt
+   <plan or diff here>" </dev/null >/dev/null 2>$OUT/log.txt
 cat $OUT/out.md
 ```
 
@@ -126,7 +126,7 @@ codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-
    Output: (1) what's strong, (2) what's risky, (3) concrete suggested changes, \
    (4) verdict: SHIP / REVISE / RETHINK.
 
-   <plan>" </dev/null 2>$OUT/log.txt
+   <plan>" </dev/null >/dev/null 2>$OUT/log.txt
 cat $OUT/out.md
 ```
 
@@ -140,7 +140,7 @@ codex exec --skip-git-repo-check --color never -c approval_policy=never -s works
    Inputs: <files/paths/data>.
    Constraints: <style, deps, must-not-touch>.
    Deliverable: <exact output format: files edited in place, patch on stdout, JSON, etc.>.
-   Apply edits directly. Do not ask for confirmation." </dev/null 2>$OUT/log.txt
+   Apply edits directly. Do not ask for confirmation." </dev/null >/dev/null 2>$OUT/log.txt
 cat $OUT/out.md
 ```
 
@@ -148,7 +148,7 @@ Long jobs run in the background and are read whole when done:
 
 ```bash
 OUT=$(mktemp -d)
-codex exec ... -o $OUT/out.md "<prompt>" </dev/null 2>$OUT/log.txt &
+codex exec ... -o $OUT/out.md "<prompt>" </dev/null >/dev/null 2>$OUT/log.txt &
 CODEX_PID=$!
 # ... continue other work ...
 wait "$CODEX_PID"; cat $OUT/out.md
@@ -174,7 +174,7 @@ OUT=$(mktemp -d)
 { printf '%s\n\n' "Review this diff for: (1) correctness bugs, (2) security issues, \
 (3) style / consistency, (4) missing tests. For each finding: file:line, severity, why, suggested fix."
   git diff main...HEAD; } > $OUT/prompt.md
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md - < $OUT/prompt.md 2>$OUT/log.txt
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md - < $OUT/prompt.md >/dev/null 2>$OUT/log.txt
 cat $OUT/out.md
 ```
 
@@ -184,8 +184,8 @@ For findings you will parse, add `--output-schema $OUT/findings.schema.json`.
 
 ```bash
 OUT=$(mktemp -d)
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<question>" </dev/null 2>$OUT/log.txt
-SID=$(grep -o 'session id: .*' $OUT/log.txt | awk '{print $3}')
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<question>" </dev/null >/dev/null 2>$OUT/log.txt
+SID=$(grep -m1 '^session id: ' $OUT/log.txt | awk '{print $3}')
 codex exec resume --skip-git-repo-check -c approval_policy=never -c sandbox_mode=read-only "$SID" "<follow-up>" </dev/null 2>$OUT/log2.txt
 ```
 
@@ -198,7 +198,7 @@ OUT=$(mktemp -d)
 codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -C /path/to/repo -o $OUT/out.md \
   "Investigate the codebase at the working root. \
    Answer: <specific question>. \
-   Cite file paths and line numbers in the answer." </dev/null 2>$OUT/log.txt
+   Cite file paths and line numbers in the answer." </dev/null >/dev/null 2>$OUT/log.txt
 cat $OUT/out.md
 ```
 
@@ -214,7 +214,7 @@ codex review --uncommitted -c sandbox_mode=read-only </dev/null 2>$OUT/log.txt
 # 3. Apply the fixes yourself, or delegate them back:
 codex exec --skip-git-repo-check --color never -c approval_policy=never -s workspace-write \
   -o $OUT/out.md "Fix these issues in <file>: <list>. Apply edits directly. Do not ask for confirmation." \
-  </dev/null 2>$OUT/log.txt
+  </dev/null >/dev/null 2>$OUT/log.txt
 ```
 
 Always validate Codex output before trusting it: read the changed files, run tests / type-check / lint, and verify the change matches the original intent.

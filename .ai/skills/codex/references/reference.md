@@ -19,7 +19,7 @@ Complete flag and subcommand reference for the OpenAI Codex CLI, verified agains
 | `--json` | Print events to stdout as JSONL instead of the final message. |
 | `--color always\|never\|auto` | Color settings (default `auto`). |
 | `-p`, `--profile <name>` | Layer `$CODEX_HOME/<name>.config.toml` on top of the base config. |
-| `--enable <feature>` / `--disable <feature>` | Feature flag toggles (`codex features` lists them). |
+| `--enable <feature>` / `--disable <feature>` | Feature flag toggles (`codex features list` lists them). |
 | `--strict-config` | Error out on unrecognized `config.toml` fields. |
 | `--ignore-user-config` | Do not load `$CODEX_HOME/config.toml` (auth still uses `CODEX_HOME`). |
 | `--ignore-rules` | Do not load user or project execpolicy `.rules` files. |
@@ -60,7 +60,7 @@ Output: a one-paragraph summary followed by `Review comment:` items, each `[P1]`
 | Subcommand | Safe from a script? | Description |
 |---|---|---|
 | `codex doctor` | yes | Diagnose installation, config, auth, and runtime health. |
-| `codex features` | yes | Inspect feature flags. |
+| `codex features list` | yes | Inspect feature flags. |
 | `codex completion <shell>` | yes | Shell completion script. |
 | `codex apply` | yes | Apply the latest diff produced by the agent as a `git apply`. |
 | `codex sandbox <cmd>` | yes | Run a command inside Codex's sandbox. |
@@ -77,7 +77,7 @@ Model ids are set with `-m` (exec) or `-c model=<id>` (review). Effort is a conf
 
 | Stream | Content |
 |---|---|
-| stdout | The agent's final message only (or JSONL events with `--json`). |
+| stdout | The agent's final message only (or JSONL events with `--json`). When `-o` is also used the message appears in both places, so the examples send stdout to `/dev/null` and read the file. |
 | stderr | `Reading additional input from stdin...` (when stdin is not a tty), the header block (version, workdir, model, provider, approval, sandbox, reasoning effort, `session id: <uuid>`), the transcript (`user`, `codex`, tool calls), and `tokens used`. |
 | `-o <file>` | The final message, written when the run completes. |
 
@@ -91,7 +91,7 @@ Every example uses the full read-only command (no `$PREFIX` variable: zsh does n
 
 ```bash
 OUT=$(mktemp -d)
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<prompt>" </dev/null 2>$OUT/log.txt
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<prompt>" </dev/null >/dev/null 2>$OUT/log.txt
 cat $OUT/out.md
 ```
 
@@ -99,7 +99,7 @@ cat $OUT/out.md
 
 ```bash
 OUT=$(mktemp -d)
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md - < $OUT/prompt.md 2>$OUT/log.txt
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md - < $OUT/prompt.md >/dev/null 2>$OUT/log.txt
 ```
 
 ### Edits applied in a repository
@@ -108,7 +108,7 @@ codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-
 OUT=$(mktemp -d)
 codex exec --color never -c approval_policy=never -s workspace-write -C /path/to/repo \
   -o $OUT/out.md "<task>. Apply edits directly. Do not ask for confirmation." \
-  </dev/null 2>$OUT/log.txt
+  </dev/null >/dev/null 2>$OUT/log.txt
 git -C /path/to/repo status --short
 ```
 
@@ -129,7 +129,7 @@ cat > $OUT/findings.schema.json <<'JSON'
  "required":["file","line","severity","note"],"additionalProperties":false}}},
  "required":["findings"],"additionalProperties":false}
 JSON
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only --output-schema $OUT/findings.schema.json -o $OUT/out.json - < $OUT/prompt.md 2>$OUT/log.txt
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only --output-schema $OUT/findings.schema.json -o $OUT/out.json - < $OUT/prompt.md >/dev/null 2>$OUT/log.txt
 jq . $OUT/out.json
 ```
 
@@ -146,8 +146,8 @@ Read the file after exit; the last `agent_message` item is the answer.
 
 ```bash
 OUT=$(mktemp -d)
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<question>" </dev/null 2>$OUT/log.txt
-SID=$(grep -o 'session id: .*' $OUT/log.txt | awk '{print $3}')
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<question>" </dev/null >/dev/null 2>$OUT/log.txt
+SID=$(grep -m1 '^session id: ' $OUT/log.txt | awk '{print $3}')
 codex exec resume --skip-git-repo-check -c approval_policy=never -c sandbox_mode=read-only "$SID" "<follow-up>" </dev/null 2>$OUT/log2.txt
 ```
 
@@ -155,7 +155,7 @@ codex exec resume --skip-git-repo-check -c approval_policy=never -c sandbox_mode
 
 ```bash
 OUT=$(mktemp -d)
-codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<prompt>" </dev/null 2>$OUT/log.txt &
+codex exec --skip-git-repo-check --color never -c approval_policy=never -s read-only -o $OUT/out.md "<prompt>" </dev/null >/dev/null 2>$OUT/log.txt &
 CODEX_PID=$!
 wait "$CODEX_PID"
 cat $OUT/out.md
