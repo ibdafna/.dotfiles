@@ -21,6 +21,6 @@ The installer links these files into the native config locations for Claude Code
 
 `skills/` holds plain copies. Nothing is fetched at install time; add or update a skill by editing the files here and committing. Sources worth knowing about when refreshing:
 
-- `rigorous-mode`, `how`, `why`, `architect`, `arena`, `swarm`, `interrogate`, the `principle-*` set, and the rest of pstack: a harness-agnostic fork of the `pstack` plugin from cursor/plugins (entry point renamed from `poteto-mode`). Its two agents live in `agents/`, linked into every harness's agents directory.
+- `rigorous-mode`, `how`, `why`, `architect`, `arena`, `swarm`, `interrogate`, the `principle-*` set, and the rest of pstack: a harness-agnostic fork of the `pstack` plugin from cursor/plugins (entry point renamed from `poteto-mode`). Its two agents live in `agents/` (Claude Code, Codex, Cursor format) and `antigravity/agents/` (Antigravity's `agent.md` format), linked into every harness's agents directory.
 - `grill-me`, `grilling`, `which-skill`, `setup-engineering-skills`, `to-tickets`, `implement`, `tdd-loop`, `teach-me`, and the rest of the engineering/productivity set: mattpocock/skills, with `ask-matt` and `setup-matt-pocock-skills` renamed, and `tdd`/`teach` renamed to `tdd-loop`/`teach-me` so they do not clash with pstack's.
 - `agent-browser`, `skill-creator`, `antigravity` (the `agy` CLI wrapper, replaces the old gemini-cli skill), `cli-for-agents` (from cursor/plugins), the marketing pack, and the ui.sh design skills: as installed from their upstreams.

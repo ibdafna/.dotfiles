@@ -301,7 +301,6 @@ For implementation, follow each platform's official documentation. Key advertisi
 | **LinkedIn Ads** | B2B, job title targeting | - |
 | **TikTok Ads** | Younger demographics, video | - |
 
-For tracking, see also: ga4.md, segment.md
 
 ---
 
