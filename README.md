@@ -46,8 +46,8 @@ The repo can also manage portable AI CLI config under `.ai/`:
 
 - `.ai/claude/settings.json` -> `~/.claude/settings.json`
 - `.ai/claude/CLAUDE.md` -> `~/.claude/CLAUDE.md`
-- `.ai/claude/skills/*` -> `~/.claude/skills/*`
-- `.ai/claude/subagents/*` -> `~/.claude/subagents/*`
+- `.ai/claude/agents/*` -> `~/.claude/agents/*`
+- `.ai/skills/*` -> `~/.claude/skills/*`, `~/.codex/skills/*`, `~/.agents/skills/*`, `~/.cursor/skills/*` (one folder of plain SKILL.md directories shared by every agent)
 - `.ai/gemini/settings.json` -> `~/.gemini/settings.json`
 - `.ai/gemini/GEMINI.md` -> `~/.gemini/GEMINI.md`
 - `.ai/gemini/commands/*` -> `~/.gemini/commands/*`
