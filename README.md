@@ -46,15 +46,13 @@ The repo can also manage portable AI CLI config under `.ai/`:
 
 - `.ai/claude/settings.json` -> `~/.claude/settings.json`
 - `.ai/claude/CLAUDE.md` -> `~/.claude/CLAUDE.md`
-- `.ai/agents/*` -> `~/.claude/agents/*`, `~/.codex/agents/*`, `~/.cursor/agents/*`
-- `.ai/skills/*` -> `~/.claude/skills/*`, `~/.codex/skills/*`, `~/.agents/skills/*`, `~/.cursor/skills/*`, `~/.gemini/config/skills/*`, `~/.gemini/antigravity/skills/*` (one folder of plain SKILL.md directories shared by every agent; the last two are the Antigravity CLI's and IDE's global skill directories)
-- `.ai/antigravity/agents/*` -> `~/.gemini/config/agents/*` (pstack's agents in Antigravity's `agent.md` format)
 - `.ai/gemini/settings.json` -> `~/.gemini/settings.json`
 - `.ai/gemini/GEMINI.md` -> `~/.gemini/GEMINI.md`
 - `.ai/gemini/commands/*` -> `~/.gemini/commands/*`
 - `.ai/gemini/extensions/*` -> `~/.gemini/extensions/*`
 - `.ai/codex/config.toml` -> `~/.codex/config.toml`
-- `.ai/codex/skills/*` -> `~/.codex/skills/*`
+
+Agent skills and agents live in their own repo, [ibdafna/skills](https://github.com/ibdafna/skills), with its own installer.
 
 Only portable config should live there. Do not commit auth, session history, caches, or other tool-managed state.
 

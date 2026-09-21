@@ -223,11 +223,6 @@ link_path "$DOTFILES_DIR/bin/tmux-sessionizer" "$HOME/bin/tmux-sessionizer"
 
 link_optional_path ".ai/claude/settings.json" "$HOME/.claude/settings.json"
 link_optional_path ".ai/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
-# Agent definitions (pstack's rigorous-agent and comment-sicko), one folder for
-# every harness that reads a personal agents directory.
-link_optional_children ".ai/agents" "$HOME/.claude/agents"
-link_optional_children ".ai/agents" "$HOME/.codex/agents"
-link_optional_children ".ai/agents" "$HOME/.cursor/agents"
 
 link_optional_path ".ai/gemini/settings.json" "$HOME/.gemini/settings.json"
 link_optional_path ".ai/gemini/GEMINI.md" "$HOME/.gemini/GEMINI.md"
@@ -235,18 +230,6 @@ link_optional_children ".ai/gemini/commands" "$HOME/.gemini/commands"
 link_optional_children ".ai/gemini/extensions" "$HOME/.gemini/extensions"
 
 link_optional_path ".ai/codex/config.toml" "$HOME/.codex/config.toml"
-
-# One shared skills folder, linked into every agent's skills directory.
-# The SKILL.md format is common to Claude Code, Codex, Cursor, and Gemini.
-link_optional_children ".ai/skills" "$HOME/.claude/skills"
-link_optional_children ".ai/skills" "$HOME/.codex/skills"
-link_optional_children ".ai/skills" "$HOME/.agents/skills"
-link_optional_children ".ai/skills" "$HOME/.cursor/skills"
-link_optional_children ".ai/skills" "$HOME/.gemini/config/skills"
-link_optional_children ".ai/skills" "$HOME/.gemini/antigravity/skills"
-
-# Antigravity (agy) defines agents as <name>/agent.md with its own frontmatter.
-link_optional_children ".ai/antigravity/agents" "$HOME/.gemini/config/agents"
 
 install_shell_manifest() {
   local manifest="$1"
